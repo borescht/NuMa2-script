@@ -72,7 +72,7 @@
 \definecolor{shadethmcolor}{HTML}{EEEEEE}
 
 \title{Numerical Mathematics II \\ SS 2019}
-\author{Lecture by Priv.-Doz. Dr. Konstantin Fackeldey}
+\author{Lecture by Konstantin Fackeldey}
 
 \begin{document}
 \maketitle
@@ -354,7 +354,7 @@ y'(t)=f(t,y(t)), ~ y(t_0)=y_0.
 \]
 We are now interested in a comparison of different solutions for $t\in[t_0,\infty)$ with respect to the initial condition. We denote the solution by $y(t)=y(t,t_0)$.
 
-Stability: $y(t_0)=\tilde y$ with $\tilde y$ near by $y_0$. The question we are dealing with is "How does $y(t,\tilde y)$ behave in comparison with $y(t,y_0)$?".\newline
+Stability means that $y(t_0)=\tilde y$ with $\tilde y$ near by $y_0$. The question we are dealing with is "How does $y(t,\tilde y)$ behave in comparison with $y(t,y_0)$?".\newline
 
 Let us consider an autonomous ODE, i.e. an ODE of the form $y'(t)=f(y(t))$.
 
@@ -369,9 +369,10 @@ An equilibrium point is \textbf{stable} (in the sense of Ljapunov) if for each $
 \[
 \norm{y(t)-\bar y}\leq \varepsilon.
 \]
-An equilibrium point is \textbf{instable} if it is not stable. \newline
 
-\noindent An equilibrium point $\bar y$ is \textbf{asymptotic stable} if there exists a neighbourhood $U_{\bar y}$ of $\bar y$ such that
+An equilibrium point is \textbf{instable} if it is not stable.
+
+An equilibrium point $\bar y$ is \textbf{asymptotic stable} if there exists a neighbourhood $U_{\bar y}$ of $\bar y$ such that
 \[
 y(t_0)\in U_{\bar y} \Rightarrow \lim_{t\to\infty} y(t)=\bar y.
 \]
