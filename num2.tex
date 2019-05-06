@@ -64,6 +64,7 @@
 \newshadetheorem{lemma}[theorem]{Lemma}
 \newshadetheorem{corollary}[theorem]{Corollary}
 \newshadetheorem{definition}[theorem]{Definition}
+\newshadetheorem{exdef}{Excursion Definition}
 \newtheorem{motivation}[theorem]{Motivation}
 \newtheorem*{remark}{Remark}
 \newtheorem*{revision}{Revision}
@@ -654,7 +655,7 @@ for $\Delta t \to 0$, since $y''$ is bounded in $[t,t+\Delta t]$.
 \end{proof}
 
 \begin{definition}[Convergence of one-step methods]
-A one-step method with starting value $y_0=y(0)+O(\Delta t^p),~\Delta t \to 0$ is convergent of order $p\in\N$ with respect to the IVP (II.1) and (II.2) if for the approximation $y_i$ of the solution $y(t_i)$ the \textbf{global approximation error}
+A one-step method with starting value $y_0=y(0)+O(\Delta t^p),~\Delta t \to 0$ is \textbf{convergent of order $p\in\N$} with respect to the IVP (II.1) and (II.2) if for the approximation $y_i$ of the solution $y(t_i)$ the \textbf{global approximation error}
 \[
 e(t_i,\Delta t)=y(t_i)-y_i
 \]
@@ -664,6 +665,189 @@ e(t_i,\Delta t)=O(\Delta t^p), ~~ \Delta t \to 0
 \]
 In case of $e(t,\Delta t)=O(1)$ we call the method \textbf{consistent}.
 \end{definition}
+
+\begin{remark}
+Note, that in $e(t_i,\Delta t)$ all $\eta(t,\Delta t)$ are summed up.
+\end{remark}
+
+\begin{lemma}[technical Lemma]
+Let $\eta_i,\varrho_i,z_i\in\R_{\geq 0}$ for $i=0,\dots,m-1$ and $z_m\in\R$ and it holds
+\[
+z_\ipo\leq (1+\varrho_i)z_i + \eta_i
+\]
+for $i=0,\dots,m-1$. Then it holds
+\[
+z_{i+1} \leq \l(z_0 + \sum_{k=0}^{i-1}\eta_k\r) e^{\sum_{k=0}^{i-1}\varrho_k}
+\]
+for $i=0,\dots,m-1$.
+\end{lemma}
+\begin{proof}
+We prove the statement by induction on $i$. For $z_0$ the claim is true. Hence let the statement be valid for a $i-1$. Then we have
+\begin{align*}
+z_\ipo
+& \leq (1+\varrho_i) z_i + \eta_i \\
+& \leq (\underbrace{1+\varrho_i}_{\leq e^{\delta_i}}) \cdot \l(z_0 + \sum_{k=0}^{i-1}\eta_k\r)e^{\sum_{k=0}^{i-1}\varrho_k} + \eta_i \\
+& \leq \l(z_0 + \sum_{k=0}^{i-1}\eta_k\r) e^{\sum_{k=0}^{i-1}\varrho_k} + \eta_i \\
+& \leq \l(z_0 + \sum_{k=0}^{i} \eta_k \r)\cdot e^{\sum_{k=0}^{i}\varrho_k},
+\end{align*}
+what ends the proof.
+\end{proof}
+
+\begin{theorem}[Convergence of one-step methods]
+Let $\Phi$ be an incremental function of a one-step method for the IVP (II.1) and (II.2) with
+\begin{align*}
+\l| \Phi(t,u,w,\Delta t) - \Phi(t,v,w,\Delta t)\r| & \leq L |u-v| \tag{II.3} \\
+\l| \Phi(t,w,u,\Delta t) - \Phi(t,w,v,\Delta t)\r| & \leq L |u-v| \tag{II.4}
+\end{align*}
+with $L\in \R$. Then it holds for $\Delta t < \tfrac{1}{L}$ that
+\[
+\l| e(t_{i+1},\Delta t)\r| \leq \l( |e(t_0,\Delta t)| + \frac{(t_i+1-t_0)}{1-\Delta t\cdot L}\cdot \frac{\eta(\Delta t)}{\Delta t}\r) e^{2 \cdot \frac{t_{i+1}-t_0}{1-\Delta t}\cdot L}\tag{II.5}
+\]
+for $i=0,\dots,n-1$, where
+\[
+\eta(\Delta t) := \max_{j=0,\dots,n-1} |\eta(t_j,\Delta t)|.
+\]
+\end{theorem}
+\begin{proof}
+Reconsider that
+\[
+\eta(t_i,\Delta t)= y(t_i)+\Delta t\Phi\l(t_i,y(t_i),y(t_i+\Delta t),\Delta t\r) - y(t_{i+1}).
+\]
+Rearranging gives
+\[
+y(t_\ipo)= y(t_i) + \Delta t\Phi\l(t_i,y(t_i),y(t_i+\Delta t),\Delta t\r) - \eta(t_i,\Delta t).
+\]
+Consider now
+\begin{align*}
+e(t_\ipo,\Delta t)
+& = y(t_\ipo)-y_\ipo  \\
+& = y(t_i)+\Delta t \Phi\l(t_i, y(t_i),y(t_\ipo),\Delta t\r) - \eta(t_i,\Delta t) \\
+& ~~~ - y_i -\Delta t \Phi \l(t_i, y_i, y_\ipo, \Delta t\r) \pm \Delta t \Phi \l(t_i,y(t_i),y_\ipo,\Delta t\r).
+\end{align*}
+Using (II.3) and (II.4) we obtain
+\begin{align*}
+|e(t_\ipo,\Delta t)|
+& \leq |e(t_i,\Delta t)| + \Delta t L|y(t_\ipo)-y_\ipo| + \Delta t L|y(t_i)-y_i| - \eta(t_i,\Delta t) \\
+& = |e(t_i,\Delta t)| + \Delta t L|e(t_{i+1},\Delta t)| + \Delta t L| e(t_i,\Delta t) | - \eta(t_i,\Delta t).
+\end{align*}
+This gives
+\begin{align*}
+(1-\Delta t L) |e(t_\ipo,\Delta t)| & \leq (1+\Delta t L) |e(t_i,\Delta t)| + |\eta(t_i,\Delta t)|,
+\end{align*}
+so
+\[
+|e(t_\ipo,\Delta t)| \leq \frac{(1+\Delta t L)}{(1-\Delta t L)} |e(t_i,\Delta t)| + \einsdurch{(1-\Delta t L)}|\eta(t_i,\Delta t)|.
+\]
+By setting
+\begin{align*}
+\varrho_i & := \frac{(1+\Delta t L)}{(1-\Delta t L)}-1 = \frac{2\Delta t L}{1-\Delta t L} \geq 0 \\
+z_i & := |e(t_i,\Delta t)| \geq 0 \\
+\eta_i & := \einsdurch{(1-\Delta t L)}\eta(\Delta t) \geq 0
+\end{align*}
+and applying Lemma II.5 we obtain
+\begin{align*}
+|e(t_\ipo,\Delta t)|
+& = z_\ipo \\
+& \leq \l(z_0 + \sum_{k=0}^{i}\eta_k\r)e^{\sum_{k=0}^{i }\varrho_k} \\
+& = \l(|e(t_0,\Delta t)| + \sum_{k=0}^{i }\einsdurch{1-\Delta t L}\eta(\Delta t)\r) e^{\sum_{k=0}^{i }\frac{2\Delta t L }{1-\Delta t L}}. \tag{$\star$}
+\end{align*}
+Observe that the two sums can be rewritten as
+\begin{align*}
+\sum_{k=0}^{i }\einsdurch{1-\Delta t L }\eta(\Delta t) = \frac{i+1}{1+\Delta t L }\eta(\Delta t) = \frac{t_{i+1}-t_0}{1+\Delta t L} \cdot \frac{\eta(\Delta t)}{\Delta t}
+\end{align*}
+and
+\begin{align*}
+\sum_{k=0}^{i }\frac{2\Delta t L}{1-\Delta t L } = (t_\ipo - t_0) \frac{2t}{1-\Delta t L}.
+\end{align*}
+Inserting this into ($\star$) gives the result.
+\end{proof}
+
+\begin{theorem}
+If a one-step method with Lipschitz condinitions (II.3) and (II.4) is consistent of order $p\in\N$ for an ODE (II.1) and if the initial value $y_0$ meets
+\[
+y_0 = \hat y_0 + O(\Delta t^p),
+\]
+then the method is convergent of order $p$ with respect to (II.1) and (II.2).
+\end{theorem}
+
+\begin{remark}\hfill
+\begin{itemize}
+     \item The error grows exponentially in time.
+     \item If in the underlying ODE the Lipschitz-constant $\hat L$ given by
+     \[
+     \l|f(t,y_1(t))-f(t,y_2(t))\r|\leq \hat L |y_1-y_2|
+     \]
+     is large, then $L$ from (II.4) and (II.5) will also be large.
+     \item If the initial condition of the explicit Euler-method meets
+     \[
+     y_0 = \hat y + O(\Delta t)
+     \]
+     then it is convergent of first order with respect to the ODE
+     \[
+     y'(t) = f(t,y(t)) , y(t_0) = \hat y_0.
+     \]
+\end{itemize}
+\end{remark}
+
+\subsubsection*{Runge-Kutta Methods}
+We already know that
+\[
+y(t_\ipo)-y(t_i) \approx \Delta t f(t,y(t)).
+\]
+Asking wether a better approximation leads to better convergence leads to the Runge-Kutta methods. Trying with the midpoint rule gives
+\begin{align*}
+\int_{t_i }^{t_\ipo}f(t,y(t))~dt \approx f \l(t_i + \tfrac{\Delta t }{2},~y\l(t_i + \tfrac{\Delta t}{2}\r)\r)\cdot \Delta t.
+\end{align*}
+But we have not evaluated $y(t_i,\tfrac{\Delta t }{2})$, what is a problem. The idea is using the explicit Euler-method to approximate $y(t_i+\tfrac{\Delta t}{2})$. Define
+\[
+y_{i+\teinhalb}:= y_i + \frac{\Delta t }{2} f(t_i, y(t_i)).
+\]
+By plugging in we obtain
+\[
+y_{i+1} = y_i + \Delta t \cdot f \l(t_i+\tfrac{\Delta t}{2}, y_i + \tfrac{\Delta t}{2} f(t_i,y(t_i))\r)
+\]
+which is also called the explicit midpoint rule.
+
+\subsubsection*{\underline{Excursion to quadrature}}
+We know, that
+\[
+I: C \to \R, ~ f\mapsto \int_{a }^{b }f(\tau )~d\tau
+\]
+is a linear functional from some function space $C$ into the real numbers.
+
+\begin{exdef}
+A function $Q_{n+1}\in C([a,b])$ with
+\[
+Q_{n+1}(f) = \sum_{i=0 }^{n}a_i f(x_i)
+\]
+with nodes $x_i\in[a,b]$ and weights $a_i\in\R$ is called a quadrature rule. Its quadrature error is the linear functional
+\[
+R_{n+1}(f)=I(f)-Q_{n+1}(f).
+\]
+The rule converges, if it holds
+\[
+\limn Q_{n+1}(f) = I(f).
+\]
+\end{exdef}
+
+\noindent There exist many quadrature rules. Here we consider \textbf{quadrature by interpolation}. Let us assume, that we know $f$ only at $(n+1)$ points $x_0,\dots, x_n$ an we interpolate $f$ by a polynomial $p$ with degree $n$.
+
+\begin{exdef}[Quadrature by interpolation]
+Let $p_n$ be a polynomial of degree $n$ on the interval $[a,b]$. We call $R_{n+1}$ a \textbf{quadrature rule by interpolation} if
+\[
+R_{n+1}(p_n) = 0,
+\]
+i.e. if a polynomial of degree $n$ can be integrated exactly.
+\end{exdef}
+
+
+
+
+
+
+
+
+
 
 
 
