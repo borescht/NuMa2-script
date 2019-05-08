@@ -52,6 +52,13 @@
 \renewcommand \thesection{\Roman{section}}
 \renewcommand \thesubsubsection{\Roman{section}.\arabic{subsubsection}}
 
+\makeatletter
+\renewcommand*\env@matrix[1][*\c@MaxMatrixCols c]{%
+  \hskip -\arraycolsep
+  \let\@ifnextchar\new@ifnextchar
+  \array{#1}}
+\makeatother
+
 \theoremstyle{plain}
 %\newtheorem{theorem}{Theorem}[section]
 %\newtheorem{lemma}[theorem]{Lemma}
@@ -794,7 +801,7 @@ We already know that
 \[
 y(t_\ipo)-y(t_i) \approx \Delta t f(t,y(t)).
 \]
-Asking wether a better approximation leads to better convergence leads to the Runge-Kutta methods. Trying with the midpoint rule gives
+Asking whether a better approximation leads to better convergence leads to the Runge-Kutta methods. Trying with the midpoint rule gives
 \begin{align*}
 \int_{t_i }^{t_\ipo}f(t,y(t))~dt \approx f \l(t_i + \tfrac{\Delta t }{2},~y\l(t_i + \tfrac{\Delta t}{2}\r)\r)\cdot \Delta t.
 \end{align*}
@@ -806,9 +813,10 @@ By plugging in we obtain
 \[
 y_{i+1} = y_i + \Delta t \cdot f \l(t_i+\tfrac{\Delta t}{2}, y_i + \tfrac{\Delta t}{2} f(t_i,y(t_i))\r)
 \]
-which is also called the explicit midpoint rule.
+which is also called the explicit midpoint rule. \newpage
 
 \subsubsection*{\underline{Excursion to quadrature}}
+\definecolor{shadethmcolor}{HTML}{F6FDFF}
 We know, that
 \[
 I: C \to \R, ~ f\mapsto \int_{a }^{b }f(\tau )~d\tau
@@ -839,6 +847,141 @@ R_{n+1}(p_n) = 0,
 \]
 i.e. if a polynomial of degree $n$ can be integrated exactly.
 \end{exdef}
+\newpage \definecolor{shadethmcolor}{HTML}{EEEEEE}
+
+\noindent Consider $\xi_j = t_i + c_j \Delta t, ~c_j \in [0,1]$ for $j=1,\dots,s$. Then we have
+\[
+y(t_\ipo) - y(t_i) = \int_{t_i }^{t_\ipo}f(\tau,y(\tau))~d\tau \approx \Delta t \sum_{j=1}^{s }b_j f(\xi_j,y(\xi_j)).
+\]
+From the quadrature by interpolation we know
+\[
+\sum_{j=1 }^{s }b_j = 1.
+\]
+But since we do not know the values $y(\xi_j)$, we have to think about how to get these values.
+
+Applying the fundamental theorem gives
+\begin{align*}
+y(\xi_j)-y(t_i) &= \int_{t_i }^{t_i + c_j \Delta t}f(t,y(t))~dt\\
+& \approx c_j \Delta t \cdot \sum_{\nu=1}^{s} \tilde{a}_{j\nu} f(\xi_\nu,y(\xi_\nu)).
+\end{align*}
+This seems strange, since we are using the same $\xi_i$. Setting $a_{j\nu}:=c_j \tilde{a}_{j\nu}$ we obtain
+\[
+k_i = y_i + \Delta t \sum_{\nu=1}^{s }a_{j\nu}f(\xi_\nu,y(\xi_\nu))
+\]
+as an approximation of $y(\xi_i)$, where $i=1,\dots,s$. This is called the \textit{Runge-Kutta methods}.
+
+\begin{definition}[Runge-Kutta-Method/RKM]
+For $b_j,c_j,a_{j\nu}\in\R,~j=1,\dots,s$ we denote
+\begin{align*}
+k_j=y_i + \Delta t \sum_{\nu=1}^{s}a_{j\nu}f(\xi_\nu,k_\nu)
+\end{align*}
+for $j=1,\dots,s$ and
+\begin{align*}
+y_{i+1}=y_i + \Delta t \sum_{j=1}^{s} b_j f(\xi_j,k_j)
+\end{align*}
+with $\xi_j=t_i+c_j\Delta t$ as an \textbf{$s$-step Runge-Kutta method}. We call $c_j$ and $b_j$ \textbf{weights}.
+\end{definition}
+
+\begin{remark}\hfill
+\begin{itemize}
+     \item A Runge-Kutta methods is defined by the parameters $a_{j\nu},b_j,c_j\in\R$.
+     \item The \textit{Butcher table} or \textit{Array} of a Runge-Kutta method can be denoted as
+     \[
+     \begin{matrix}[c|cccc]
+     c_1 & a_{11} & \dots & a_{1s} \\ \vdots & \vdots & &\vdots \\ c_s & a_{s1} & \cdots & a_{ss} \\ \hline & b_1 & \cdots & b_s
+     \end{matrix}~.
+     \]
+\end{itemize}
+\end{remark}
+
+\begin{example}\hfill
+\begin{enumerate}[(1)]
+\item For the explicit Euler method, the Butcher table is given by $~\begin{matrix}[c|c]0&0\\ \hline &1\end{matrix}~$, which is equivalent to $k_1=y_i$ and $y_{i+1}=y_i+\Delta t f(t_i,k_1)$.
+\item For the implicit Euler method, the Butcher table is given by $~\begin{matrix}[c|c]1&1\\ \hline &1\end{matrix}~$, which is equivalent to $y_{i+1}=k_1=y_i+\Delta t f(t_i,k_1)$.
+\item For the explicit midpoint rule, the Butcher tabel is given by
+\[
+\begin{matrix}[c|cc]
+0 & 0 & 0 \\ \einhalb & \einhalb & 0 \\ \hline & 0 &1
+\end{matrix}
+\]
+which is equivalent to
+\begin{align*}
+k_1 &= y_i\\
+k_2 &= y_i + \frac{\Delta t }{2 } f(t_1,k_1) \\
+y_{i+1} &= y_i + \Delta t f\l(t_i+\tfrac{\Delta t}{2}, k_2\r).
+\end{align*}
+\end{enumerate}
+\end{example}
+
+\noindent The Runge-Kutta method can also be seen from a predictor-corrector method-point of view. For that, consider the trapezoid rule given by
+\[
+y(t_{i+1})-y(t_i) \approx \frac{\Delta t }{2 }\Big(f(t_i,y(t_i))+f(t_\ipo,y(t_\ipo))\Big).
+\]
+We obtain
+\[
+y_\ipo = y_i + \frac{\Delta t }{2} \Big(f(t_i,y_i)+f(t_\ipo,y_\ipo)\Big).
+\]
+Since we do not know $y_\ipo$, we approximate $f(t_\ipo,y_\ipo)$ by $f(t_\ipo,k_2)$, where
+\[
+k_2 = y_i + \Delta t f(t_i,y_i)
+\]
+is derived from the explicit Euler method. We thus have
+\begin{align*}
+k_1 & = y_i \\
+k_2 & = y_i + \Delta t f(t_i,y_i) \\
+y_\ipo & = y_i + \frac{\Delta t }{2} \Big(f(t_1,k_1)+f(t_\ipo,k_2)\Big).
+\end{align*}
+In this case, $k_2$ is called a predictor and since we have
+\[
+y_{i+1} = k_2 + \frac{\Delta t }{2 }\Big(f(t_i,k_2)-f(t_i,k_1)\Big),
+\]
+the term
+\[
+\frac{\Delta t }{2 }\Big(f(t_i,k_2)-f(t_i,k_1)\Big)
+\]
+is called the corrector. \newline
+
+\noindent Instead of computing $k_j$ at $y(\xi_j)$ we can use the slopes or gradients
+\[
+r_j = f(t_i+c_j\Delta t, k_j).
+\]
+Within the predictor-corrector method we have
+\begin{align*}
+r_1 & = f(t_i,y_i) \\
+r_2 & = f\l(t_i + \Delta t, y_i + \Delta t r_1\r)\\
+y_\ipo & = y_i + \frac{\Delta t }{2 }(r_1+r_2),
+\end{align*}
+where $r_1+r_2$ can be seen as an intermediate slope. By setting $r_j = f(t_i+c_j\Delta t, k_j)$ we obtain a Runge-Kutta method
+\begin{align*}
+r_j & = f(t_i + c_j \Delta t, k_j) \\
+& = f\l(t_i + c_j \Delta t, y_i+\Delta t\cdot \sum_{\nu=1}^{s }a_{j\nu}f(\xi_\nu,k_\nu)\r) \\
+& = f \l(t_i+c_j\Delta t, y_i + \Delta t \sum_{\nu=1}^{s }a_{j\nu} r_\nu\r).
+\end{align*}
+By summing up, we can write
+\begin{align*}
+y_\ipo = y_i + \Delta t \sum_{j=1 }^{s }b_j r_j.
+\end{align*}
+
+\noindent When computing for example $r_3$, it can happen that we end up with the form
+\[
+r_3 = f \l(\dots, \sum_{\nu=1}^{s}a_{j\nu}r_\nu\r),
+\]
+where $r_3$ depends on $r_3$. Analogue to the one-step methods, in this case we call the Runge-Kutta method implicit. Let us assume, that $A=[a_{j\nu}]\in\R^{s,s}$ is a strict lower triangle matrix, i.e. $a_{j\nu}=0$ for $\nu\geq j$. Then we obtain
+\begin{align*}
+r_j = f \l(t_i + c_\nu \Delta t, y_i + \Delta t\cdot \sum_{\nu=1}^{j-1}a_{j\nu} r_\nu\r)
+\end{align*}
+for $j=1,\dots,s$ and hence we have an \textbf{explicit Runge-Kutta method}. If we don't have such a matrix $A$, we have an \textbf{implicit Runge-Kutta method}.
+
+Note, that unlike to one-step methods, in Runge-Kutta methods explicit and implicit only refers to the intermediate steps between $t_i$ and $t_\ipo$. \newline
+
+\noindent Let us assume, that we have a full matrix A and $f:[a,b]\times \R^m \to \R^m$. Then
+\begin{align*}
+r_1 & = f \l(t_i + c_1 \Delta t, y_i + \Delta t \cdot \sum_{\nu=1}^{s }a_{1\nu} r_\nu\r) \\
+& \cdots \\
+r_s & = f \l(t_i + c_s\Delta t, y_i + \Delta t \cdot \sum_{\nu=1}^{s }a_{s\nu} r_\nu \r)
+\end{align*}
+is a system of dimension $s-m$ for computing the gradients $r_j\in\R^m$. It might be linear or non-linear, depending on the underlying system. 
+
 
 
 
