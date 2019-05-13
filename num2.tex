@@ -23,7 +23,7 @@
 \newcommand{\einhalb}{\frac{1}{2}}
 \newcommand{\teinhalb}{\tfrac{1}{2}}
 \newcommand{\halbe}[1]{\frac{#1}{2}}
-\newcommand{\norm}[1]{\lVert #1 \rVert}
+\newcommand{\norm}[1]{\left\Vert #1 \right \Vert}
 \newcommand{\bignorm}[1]{\big\lVert #1 \big\rVert}
 \newcommand{\Bignorm}[1]{\Big\lVert #1 \Big\rVert}
 \newcommand{\biggnorm}[1]{\bigg\lVert #1 \bigg\rVert}
@@ -977,10 +977,146 @@ Note, that unlike to one-step methods, in Runge-Kutta methods explicit and impli
 \noindent Let us assume, that we have a full matrix A and $f:[a,b]\times \R^m \to \R^m$. Then
 \begin{align*}
 r_1 & = f \l(t_i + c_1 \Delta t, y_i + \Delta t \cdot \sum_{\nu=1}^{s }a_{1\nu} r_\nu\r) \\
-& \cdots \\
+&\cdots \tag{II.$\star$} \\
 r_s & = f \l(t_i + c_s\Delta t, y_i + \Delta t \cdot \sum_{\nu=1}^{s }a_{s\nu} r_\nu \r)
 \end{align*}
-is a system of dimension $s-m$ for computing the gradients $r_j\in\R^m$. It might be linear or non-linear, depending on the underlying system. 
+is a system of dimension $s-m$ for computing the gradients $r_j\in\R^m$. It might be linear or non-linear, depending on the underlying system.
+
+\begin{example}[Classical Runge-Kutta method]
+Let the Butcher table be given by
+\[
+\begin{matrix}[c|cccc]
+0 & 0 & 0 & 0 & 0 \\
+\teinhalb & \teinhalb & 0 & 0 & 0 \\
+\teinhalb & 0 & \teinhalb & 0 & 0 \\
+1 & 0 & 0 & 1 & 0 \\ \hline
+& \tfrac{1}{6} & \tfrac{1}{3} & \tfrac{1}{3} & \tfrac{1}{6}
+\end{matrix}~.
+\]
+This Butcher table gives an explicit Runge-Kutte method, since $A$ is a strict lower triangular matrix. We thus have
+\[
+y_\ipo = y_i + \Delta t \Big( \tfrac{1}{6} r_1 + \tfrac{1}{3} r_2 + \tfrac{1}{3} r_3 + \tfrac{1}{6} r_4 \Big)
+\]
+and further
+\begin{align*}
+r_1 & = f(t_i+ 0\cdot\Delta t, y_i + \Delta t\cdot 0) = f(t_i,y_i) \\
+r_2 & = f \l(t_i + \frac{\Delta t}{2}, y_i + \frac{\Delta t }{2} r_1\r) \\
+r_3 & = f \l(t_i + \frac{\Delta t }{2}, y_i + \frac{\Delta t }{2 }r_2\r) \\
+r_4 & = f(t_1 + \Delta t, y_1 + \Delta t r_3).
+\end{align*}
+{\rot \texttt{The drawing is missing.}} A Runge-Kutta method hence allows us to approximate $f$ on intermediate steps. This can be very useful, since in many cases the function $f$ is hard or expensive to evaluate.
+\end{example}
+
+
+\noindent Reconsider the (maybe non-linear) system (II.$\star$) for computing the gradients $r_j$. The following theorem shows that the system can be solved if $f$ satisfies certain conditions. In particular, we can, in some sense, buy the solveability of the system (II.$\star$) by choosing smaller time steps.
+
+\begin{theorem}
+Let the mapping $f:[a,b] \times \R^m \to \R^m$ be continuous so that it holds
+\[
+\norm{ f(t,\tilde y) - f(t,y) }_\infty \leq L \norm{\tilde y - y}_\infty
+\]
+for all $t\in [a,b]$, where $L>0$ is a Lipschitz constant. Consider the Runge-Kutta method $(A,b,c)$ with $\Delta t < \tfrac{1}{L\norm{A}_\infty}$. Then for any $j=1,\dots,s$, the iteration given by
+\[
+r_j^{(\ell+1)} = f \l(t_i + c_i \Delta t, ~ y_i + \Delta t \sum_{\nu=1 }^{s }a_{j\nu} r_\nu^{(\ell)}\r)
+\]
+converges for $\ell \to \infty$ to an arbitrary initialization $r_1^{(0)}, \dots, r_s^{(0)}$ to the unique solution of the system
+\[
+r_j= f\l(t_i+c_j\Delta t,~y_i+\Delta t \sum_{\nu=1 }^{s }a_{j\nu} r_\nu\r).
+\]
+\end{theorem}
+\begin{proof}
+We set
+\[
+R:=\begin{bmatrix} r_1 \\ \vdots \\ r_s \end{bmatrix} \und F:= \begin{bmatrix} F_1 \\ \vdots \\ F_2 \end{bmatrix} : \R^{s\cdot m} \to \R^{s\cdot m}
+\]
+with
+\[
+F_j(R) = f \l(t_i + c_j\Delta t,~ y_i + \Delta t \sum_{\nu=1}^{s }a_{j\nu}r_\nu \r).
+\]
+We thus have
+\begin{align*}
+\norm{F(R)-F(\tilde R)}_\infty
+& \leq L \cdot \norm{
+\begin{bmatrix} \Delta t \sum_{\nu=1}^{s}a_{1\nu}(r_\nu - \tilde r_\nu) \\
+      \vdots \\
+      \Delta t \sum_{\nu=1}^{s}a_{s\nu}(r_\nu - \tilde r_\nu)
+\end{bmatrix}}_\infty
+\end{align*}
+with
+\[
+\norm{
+\begin{bmatrix} \Delta t \sum_{\nu=1}^{s}a_{1\nu}(r_\nu - \tilde r_\nu) \\
+      \vdots \\
+      \Delta t \sum_{\nu=1}^{s}a_{s\nu}(r_\nu - \tilde r_\nu)
+\end{bmatrix}}_\infty \leq \norm{
+\begin{bmatrix} \Delta t \sum_{\nu=1}^{s}a_{1\nu} \\
+      \vdots \\
+      \Delta t \sum_{\nu=1}^{s}a_{s\nu}
+\end{bmatrix}}_\infty  \cdot \norm{R - \tilde R}_\infty.
+\]
+we obtain
+\[
+\norm{F(R)-F(\tilde R)} \leq L \cdot \Delta t \cdot \underbrace{\l(\max_{i=1,\dots,s} \sum_{\nu=1}^{s}|a_{i\nu} \norm{R-\tilde R}_\infty \r)}_{= \norm{A}_\infty}
+\]
+which is a contraction in the Banachspace $(\R^{s\cdot m}, \norm{\cdot}_\infty)$ if $L\cdot \Delta t \norm{A}_\infty
+ < 1$. The Banach-fixpoint theorem then implies that there exists an $R\in\R^{s\cdot m}$ as the fixed point of this iteration. Furthermore, $(R^{(\ell)})_\ell$ with $R^{(\ell+1)} = F(R^{(\ell)})$ converges towards R.
+\end{proof}
+
+\begin{remark}
+After Definition II.2 (consistency) we saw, that the minimum requirement for a consistent method is
+\[
+\lim_{\Delta t \to 0} \Phi(t,y(t),y(t+\Delta t),\Delta t) = f(t,y). \tag{II.6}
+\]
+\end{remark}
+
+\noindent We now are interested in the consistency of arbitrary Runge-Kutta methods. Reconsider
+\begin{align*}
+r_j & = f\l(t_i + c_j \Delta t, ~ y(t_i) + \Delta t \sum_{\nu=1}^{s }a_{j\nu }r_\nu\r) \\
+& = f(t_i, y(t_i)) + O(\Delta t),
+\end{align*}
+since
+\begin{align*}
+y_\ipo & = y_i + \Delta t \cdot \Phi(t_i, y(t_i), y(t_i+\Delta t),\Delta t) \\
+& = y_i + \Delta t \cdot \sum_{j=1 }^{s} b_j r_j.
+\end{align*}
+We further have that
+\[
+\Phi(t_i, y(t_i), y(t_i+\Delta t), \Delta t) = \sum_{j=1}^{s }b_j f(t,y(t_i))+ O(\Delta t)
+\]
+and hence
+\[
+\lim_{\Delta t \to 0} \Phi(t_i, y(t_i), y(t_i+\Delta t), \Delta t)  = f(t_i,y(t_i)) \gdw \sum_{j=1}^{s }b_j = 1.
+\]
+This makes hope for determining the order of consistency of a Runge-Kutta method by looking at its Butcher table. The next theorem gives us precise conditions to that.
+
+\setcounter{theorem}{10}
+\begin{theorem}
+For a Runge-Kutta method $(A,b,c)$ it holds
+\begin{enumerate}[(a)]
+\item The method has at least order of consistency at least $p=1$ if
+\[
+\sum_{j=1}^{s }b_j = 1 \und \sum_{\nu=1 }^{s }a_{j\nu} = c_j \tag{II.7}
+\]
+holds for all $j=1,\dots,s$.
+\item The method has order of consistency at least $p=2$ if it holds (II.7) and
+\[
+\sum_{j=1}^{s }b_j c_j = \einhalb \tag{II.8}
+\]
+holds.
+\item The method has order of consistency at least $p=3$ if (II.7), (II.8) and
+\[
+\sum_{j=1}^{s }b_jc_j^2 = \einsdurch{3} \und \sum_{j=1}^{s} b_j \sum_{\nu=1}^{s }a_{j\nu} c_\nu = \einsdurch{6}
+\]
+hold.
+\end{enumerate}
+\end{theorem}
+\begin{proof}
+The proof can be found in \textit{Deuflhard/Bornemann: Numerische Mathematik II, Chapter 4} and is not given in this lecture.
+\end{proof}
+
+
+
+
 
 
 
