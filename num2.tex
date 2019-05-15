@@ -1087,9 +1087,17 @@ and hence
 \[
 \lim_{\Delta t \to 0} \Phi(t_i, y(t_i), y(t_i+\Delta t), \Delta t)  = f(t_i,y(t_i)) \gdw \sum_{j=1}^{s }b_j = 1.
 \]
+In summary, we have proven the following result.
+
+\begin{lemma}
+A Runge-Kutta method given by $(A,b,c)$ is consistent in the sense of (II.6) if and only if it holds
+\[
+\sum_{j=1}^{s }b_j = 1.
+\]
+\end{lemma}
+
 This makes hope for determining the order of consistency of a Runge-Kutta method by looking at its Butcher table. The next theorem gives us precise conditions to that.
 
-\setcounter{theorem}{10}
 \begin{theorem}
 For a Runge-Kutta method $(A,b,c)$ it holds
 \begin{enumerate}[(a)]
@@ -1113,6 +1121,176 @@ hold.
 \begin{proof}
 The proof can be found in \textit{Deuflhard/Bornemann: Numerische Mathematik II, Chapter 4} and is not given in this lecture.
 \end{proof}
+
+\begin{remark}\hfill
+\begin{itemize}
+     \item In the case of an explicit Runge Kutta method the conditions in theorem II.11 are equivalent conditions to the consistency.
+     \item The proof of the theorem relies on Taylor expansion.
+     \item In principle, this technique is also working for higher orders. However, for higher orders we get more conditions on the coefficients $(A,b,c)$ of the Runge-Kutta method. The number of conditions $N_p$ increases rapidly when the order increases, since for $p=15$ there are already $141 083$ conditions needed.
+     \item It seems to be, that the number of stages (steps) of an explicit Runge-Kutta method gives the order. But it holds
+
+     \centering{\begin{tabular}{c|c|c|c|c||c|c|c|c|c}
+          order $p$ & $1$ & 2 & 3 & 4 & 5 & 6 & $\cdots$\!& 12 & 14 \\ \hline
+          $s$ (stages) & 1 & 2 & 3 & 4 & 6 & 7 &  $\cdots$\!& 25 & 35
+     \end{tabular}.}
+\end{itemize}
+\end{remark}
+
+\begin{theorem}
+For an explicit Runge-Kutta method with $s$ stages and order of consistency $p$ it holds
+\[
+p \leq s.
+\]
+\end{theorem}
+\begin{proof}
+The proof is an exercise on the fourth sheet.
+\end{proof}
+
+\noindent In chapter I we saw that any non-autonomous system
+\begin{align*}
+y'(t) & = f(t,y(t)) \\
+y(t_0) & y_0
+\end{align*}
+can be transformed to an autonomous system
+\begin{align*}
+z'(t) & = \hat f(z(t)) \tag{II.9}\\
+z'(t_0) & = z_0 = \begin{bmatrix} y_0 \\ t_0 \end{bmatrix}
+\end{align*}
+by the transformation
+\begin{align*}
+z & =\begin{bmatrix} y \\ s \end{bmatrix} \\
+\hat f(z) &= \begin{bmatrix} f(s,y) \\ 1 \end{bmatrix}.
+\end{align*}
+We want to know if the result of an explicit Runge-Kutta method stays the same when we apply the Runge-Kutta method to the autonomous system.
+
+By applying the explicit Runge-Kutta method to the autonomous sytem (II.9), we obtain
+\begin{align*}
+z_{i+1} & = z_i + \Delta t \sum_{j=1}^{s} b_j \hat r_j,
+\end{align*}
+or more precisely
+\begin{align*}
+\begin{bmatrix} y_{i+1} \\ t_{i+1} \end{bmatrix}  & = \begin{bmatrix} y_i \\ t_i  \end{bmatrix}  + \Delta t \sum_{j=1}^{s }b_j \begin{bmatrix} 1 \\ r_j \end{bmatrix}.
+\end{align*}
+We will first just consider the lower part of the last equation, i.e.
+\[
+t_{i+1} = t_i + \Delta t \sum_{j=1}^{s }b_j = t_i + \Delta t,
+\]
+so it is necessery that
+\[
+\sum_{j=1}^{s }b_j = 1.
+\]
+Further, we have that
+\begin{align*}
+\hat r_j & = \begin{bmatrix} r_j \\ 1 \end{bmatrix} = \hat f \l(z_i + \Delta t \sum_{\nu=1}^{s }a_{j\nu} \hat r_\nu\r) \\
+& = \hat f \l(\begin{bmatrix} y_i \\ t_i  \end{bmatrix} + \Delta t \sum_{\nu=1}^{s }a_{j\nu } \begin{bmatrix} r_j \\ 1 \end{bmatrix} \r),
+\end{align*}
+such that\footnote{Remember that in the non-autonomous case the structure of $r_j$ is
+\[
+r_j = f \l(t_i + c_j \Delta t, ~ y_i + \Delta t \sum_{\nu=1 }^{s }a_{j\nu} r_\nu\r).
+\]
+}
+\begin{align*}
+r_j = f \l(t_i+\Delta t \sum_{\nu=1}^{s }a_{j\nu}\cdot 1, ~ y_i + \Delta t \sum_{\nu=1}^{s }a_{j\nu }r_\nu\r),
+\end{align*}
+so our second condition is
+\[
+\sum_{\nu=1 }^{s }a_{j\nu} = c_j.
+\]
+We summarize our result in the following lemma.
+
+\begin{lemma}
+The explicit Runge-Kutta method $(A,b,c)$ is invariant to making it autonomous if and only if it holds
+\begin{enumerate}[(i)]
+\item
+\[
+\sum_{j=1 }^{s }b_j = 1
+\]
+\item
+\[
+\sum_{\nu=1}^{s }a_{j\nu} =c_j
+\]
+for all $j=1,\dots,s$.
+\end{enumerate}
+\end{lemma}
+
+We are heading towards the implicit Runge-Kutta methods and try to motivate it.
+
+Since in the implicit case the matrix $A$ has more non-zero entries, we have more conditions to our method. We seek to find out if it is possible to use the additional coefficients of an implicit Runge-Kutta method to obtain a higher order for a given number $s$ of stages. In the explicit case, theorem II.12 shows that for the order of consistency $p$ it holds $p\leq s$, so we want to find out if it is possible that $p>s$ for a implicit Runge-Kutta method.
+
+Our idea is to use collocation method, i.e. choose (simple) functions from some function space (e.g. polynomials $\mathbb{P}$) and a set of collocation points (pairwise different points) and set the free coefficients of the (simple) function such that the problem function (e.g. $f$) holds in the collocation points. Consider the ODE
+\[
+y'(t) = f(t,y(t)), ~y(t_0)=y_0.
+\]
+We assume that the numerical solution has been carried up to the point $(t_i,y_i)$. We now seek for a recipe to advance it to $(t_{i+1},y_{i+1})$, where $t_{i+1}=t_i+\Delta t$. To do so, we choose $s$ collocation points $c_1,\dots,c_s\in[0,1]$ and then seek for a $s$-th degree polynomial $u_s\in\mathbb{P}_s$, such that it holds
+\begin{align*}
+u_s(t_i) & = y_i \tag{II.10} \\
+u_s'(t_i+c_j\Delta t) & = f\Big(t_i+c_j\Delta t,~u_s(t_i+c_j\Delta t)\Big)
+\end{align*}
+for $j=1,\dots,s$.
+
+A \textbf{collocation method} consists of finding such a $u_s$ and setting $y_{i+1} = u(t_{i+1})$.
+
+But we do not yet know, what the relation to a Runge-Kutta method is.
+
+\begin{lemma}
+The collocation method defined by (II.10) is equivalent to a $s$ stage implicit Runge-Kutta method with the coefficients
+\begin{align*}
+a_{ji}& =\int_{0}^{c_j }L_i(\tau)~d\tau \tag{II.11} \\
+b_j & = \int_{0}^{1}L_j(\tau )~d\tau,\tag{II.12}
+\end{align*}
+where $L_j(\tau)$ is the Lagrangian interpolation polynomial
+\[
+L_j(\tau) = \prod_{\substack{\ell = 1 \\ \ell \neq j}}^{s} \frac{\tau - c_\ell}{c_j - c_\ell}.
+\]
+\end{lemma}
+\begin{proof}
+By the collocation polynomial $u_s(t)$ we define $r_j:= u_s'(t_i+c_j\Delta t)$. By the Lagrange interpolation formula, for any $\tau \in [0,1]$ we have that
+\[
+u'_s(t_i+\tau\Delta t) = \sum_{\ell=1}^{s }L_\ell(\tau)r_\ell.
+\]
+Integration gives
+\begin{align*}
+u_s(t_i+c_j\Delta t) & = u_s(t_i) + \Delta t \cdot \sum_{\ell=1 }^{s }r_\ell \int_{0}^{c_j}L_\ell(\tau)~d\tau
+\end{align*}
+for all $j=1,\dots,s$. Inserting for (II.11) gives
+\[
+u_s(t_i+c_j\Delta t) = u_s(t_i)+\Delta t  \sum_{\ell=1}^{s}r_\ell a_{j\ell}.
+\]
+Since
+\[
+r_j = u_s'(t_i+c_j\Delta t)\overset{\text{(II.10)}}{=} f\Big(t_i+c_j\Delta t,~u_s(t_i+c_j\Delta t)\Big),
+\]
+we obtain
+\[
+u_s(t_i+c_j\Delta t) = u_s(t_i) + \Delta t \sum_{\ell=1}^{s }a_{j\ell} f\Big(t_i+c_j\Delta t,~u_s(t_i+c_j\Delta t)\Big),\tag{$\star$}
+\]
+or
+\[
+u_s(t_i+\Delta t) = u_s(t_i) + \Delta t \sum_{j=1}^{s }b_j f\Big(t_i+c_j\Delta t,~u_s(t_i+c_j\Delta t)\Big). \tag{$\star\star$}
+\]
+Since in the collocation method we set $u_s(t_i)= y_i$ and $u_s(t_{i+1})=y_{i+1}$, we have the Runge-Kutta method in ($\star$) and ($\star\star$).
+\end{proof}
+
+We do not know yet, if every Runge-Kutta method originates in collocation. In general, this is not true, as the following example demonstrates: Consider the two stage Runge-Kutta method with $c_1=0,~c_2=\tfrac{2}{3}$. Computing $L_1,L_2$ and $a_{ji},b_i$ via (II.11) and (II.12) will give
+\[
+\begin{matrix}[c|cc]
+     0 & 0 & 0 \\
+     \tfrac{2}{3} & \tfrac{1}{3} & \tfrac{1}{3} \\ \hline
+     & \tfrac{1}{4} & \tfrac{3}{4}
+\end{matrix}~~.
+\]
+Given that every choice of collocation points corresponds to an unique collocation method (Lagrange interpolation, Numerical Mathematics I) we deduce, that the implicit Runge-Kutta method
+\[
+\begin{matrix}[c|cc]
+     0 &\tfrac{1}{4}& -\tfrac{1}{4} \\
+     \tfrac{2}{3} & \tfrac{1}{4} & \tfrac{5}{12} \\ \hline
+     & \tfrac{1}{4} & \tfrac{3}{4}
+\end{matrix}
+\]
+with order $p\geq 3$ has no collocation counterpart.
+
+
+
 
 
 
