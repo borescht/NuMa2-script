@@ -24,6 +24,7 @@
 \newcommand{\teinhalb}{\tfrac{1}{2}}
 \newcommand{\halbe}[1]{\frac{#1}{2}}
 \newcommand{\norm}[1]{\left\Vert #1 \right \Vert}
+\newcommand{\scal}[2]{\langle #1, #2 \rangle}
 \newcommand{\bignorm}[1]{\big\lVert #1 \big\rVert}
 \newcommand{\Bignorm}[1]{\Big\lVert #1 \Big\rVert}
 \newcommand{\biggnorm}[1]{\bigg\lVert #1 \bigg\rVert}
@@ -48,6 +49,7 @@
 \newcommand{\nhn}{\newline\hfill\newline}
 \renewcommand{\l}{\left}
 \renewcommand{\r}{\right}
+\renewcommand{\P}{\mathbb{P}}
 
 \renewcommand \thesection{\Roman{section}}
 \renewcommand \thesubsubsection{\Roman{section}.\arabic{subsubsection}}
@@ -71,7 +73,8 @@
 \newshadetheorem{lemma}[theorem]{Lemma}
 \newshadetheorem{corollary}[theorem]{Corollary}
 \newshadetheorem{definition}[theorem]{Definition}
-\newshadetheorem{exdef}{Excursion Definition}
+\newshadetheorem{exthm}{Excursion Theorem}
+\newshadetheorem{exdef}[exthm]{Excursion Definition}
 \newtheorem{motivation}[theorem]{Motivation}
 \newtheorem*{remark}{Remark}
 \newtheorem*{revision}{Revision}
@@ -756,7 +759,7 @@ and applying Lemma II.5 we obtain
 |e(t_\ipo,\Delta t)|
 & = z_\ipo \\
 & \leq \l(z_0 + \sum_{k=0}^{i}\eta_k\r)e^{\sum_{k=0}^{i }\varrho_k} \\
-& = \l(|e(t_0,\Delta t)| + \sum_{k=0}^{i }\einsdurch{1-\Delta t L}\eta(\Delta t)\r) e^{\sum_{k=0}^{i }\frac{2\Delta t L }{1-\Delta t L}}. \tag{$\star$}
+& = \l(|e(t_0,\Delta t)| + \sum_{k=0}^{i }\einsdurch{1-\Delta t L}\eta(\Delta t)\r) e^{\sum_{k=0}^{i }\frac{2\Delta t L }{1-\Delta t L}}. \tag{$\ast$}
 \end{align*}
 Observe that the two sums can be rewritten as
 \begin{align*}
@@ -766,11 +769,11 @@ and
 \begin{align*}
 \sum_{k=0}^{i }\frac{2\Delta t L}{1-\Delta t L } = (t_\ipo - t_0) \frac{2t}{1-\Delta t L}.
 \end{align*}
-Inserting this into ($\star$) gives the result.
+Inserting this into ($\ast$) gives the result.
 \end{proof}
 
 \begin{theorem}
-If a one-step method with Lipschitz condinitions (II.3) and (II.4) is consistent of order $p\in\N$ for an ODE (II.1) and if the initial value $y_0$ meets
+If a one-step method with Lipschitz conditions (II.3) and (II.4) is consistent of order $p\in\N$ for an ODE (II.1) and if the initial value $y_0$ meets
 \[
 y_0 = \hat y_0 + O(\Delta t^p),
 \]
@@ -868,7 +871,7 @@ This seems strange, since we are using the same $\xi_i$. Setting $a_{j\nu}:=c_j 
 \[
 k_i = y_i + \Delta t \sum_{\nu=1}^{s }a_{j\nu}f(\xi_\nu,y(\xi_\nu))
 \]
-as an approximation of $y(\xi_i)$, where $i=1,\dots,s$. This is called the \textit{Runge-Kutta methods}.
+as an approximation of $y(\xi_i)$, where $i=1,\dots,s$. These methods are called the \textit{Runge-Kutta methods}.
 
 \begin{definition}[Runge-Kutta-Method/RKM]
 For $b_j,c_j,a_{j\nu}\in\R,~j=1,\dots,s$ we denote
@@ -901,7 +904,7 @@ with $\xi_j=t_i+c_j\Delta t$ as an \textbf{$s$-step Runge-Kutta method}. We call
 \item For the explicit midpoint rule, the Butcher tabel is given by
 \[
 \begin{matrix}[c|cc]
-0 & 0 & 0 \\ \einhalb & \einhalb & 0 \\ \hline & 0 &1
+0 & 0 & 0 \\ \teinhalb & \teinhalb & 0 \\ \hline & 0 &1
 \end{matrix}
 \]
 which is equivalent to
@@ -977,7 +980,7 @@ Note, that unlike to one-step methods, in Runge-Kutta methods explicit and impli
 \noindent Let us assume, that we have a full matrix A and $f:[a,b]\times \R^m \to \R^m$. Then
 \begin{align*}
 r_1 & = f \l(t_i + c_1 \Delta t, y_i + \Delta t \cdot \sum_{\nu=1}^{s }a_{1\nu} r_\nu\r) \\
-&\cdots \tag{II.$\star$} \\
+&\cdots \tag{II.$\ast$} \\
 r_s & = f \l(t_i + c_s\Delta t, y_i + \Delta t \cdot \sum_{\nu=1}^{s }a_{s\nu} r_\nu \r)
 \end{align*}
 is a system of dimension $s-m$ for computing the gradients $r_j\in\R^m$. It might be linear or non-linear, depending on the underlying system.
@@ -1004,11 +1007,11 @@ r_2 & = f \l(t_i + \frac{\Delta t}{2}, y_i + \frac{\Delta t }{2} r_1\r) \\
 r_3 & = f \l(t_i + \frac{\Delta t }{2}, y_i + \frac{\Delta t }{2 }r_2\r) \\
 r_4 & = f(t_1 + \Delta t, y_1 + \Delta t r_3).
 \end{align*}
-{\rot \texttt{The drawing is missing.}} A Runge-Kutta method hence allows us to approximate $f$ on intermediate steps. This can be very useful, since in many cases the function $f$ is hard or expensive to evaluate.
+{\rot \texttt{The drawing is missing.}} A Runge-Kutta method hence allows us to approximate $f(t,y(t))$ on intermediate steps, i.e. estimate $y(t)$ on intermediate steps. %This can be very useful, since in many cases the function $y$ is hard or expensive to evaluate.
 \end{example}
 
 
-\noindent Reconsider the (maybe non-linear) system (II.$\star$) for computing the gradients $r_j$. The following theorem shows that the system can be solved if $f$ satisfies certain conditions. In particular, we can, in some sense, buy the solveability of the system (II.$\star$) by choosing smaller time steps.
+\noindent Reconsider the (maybe non-linear) system (II.$\ast$) for computing the gradients $r_j$. The following theorem shows that the system can be solved if $f$ satisfies certain conditions. In particular, we can, in some sense, buy the solvability of the system (II.$\ast$) by choosing smaller time steps.
 
 \begin{theorem}
 Let the mapping $f:[a,b] \times \R^m \to \R^m$ be continuous so that it holds
@@ -1101,17 +1104,17 @@ This makes hope for determining the order of consistency of a Runge-Kutta method
 \begin{theorem}
 For a Runge-Kutta method $(A,b,c)$ it holds
 \begin{enumerate}[(a)]
-\item The method has at least order of consistency at least $p=1$ if
+\item The method has order of consistency $p\geq1$ if
 \[
 \sum_{j=1}^{s }b_j = 1 \und \sum_{\nu=1 }^{s }a_{j\nu} = c_j \tag{II.7}
 \]
 holds for all $j=1,\dots,s$.
-\item The method has order of consistency at least $p=2$ if it holds (II.7) and
+\item The method has order of consistency $p\geq2$ if it holds (II.7) and
 \[
 \sum_{j=1}^{s }b_j c_j = \einhalb \tag{II.8}
 \]
 holds.
-\item The method has order of consistency at least $p=3$ if (II.7), (II.8) and
+\item The method has order of consistency $p\geq3$ if (II.7), (II.8) and
 \[
 \sum_{j=1}^{s }b_jc_j^2 = \einsdurch{3} \und \sum_{j=1}^{s} b_j \sum_{\nu=1}^{s }a_{j\nu} c_\nu = \einsdurch{6}
 \]
@@ -1143,7 +1146,10 @@ p \leq s.
 \]
 \end{theorem}
 \begin{proof}
-The proof is an exercise on the fourth sheet.
+If we can find one IVP such that $p>s$ leads to a contradiction, the claim is proven. Consider
+\[
+y'(t) = y(t), ~ y(0) = 1.
+\]
 \end{proof}
 
 \noindent In chapter I we saw that any non-autonomous system
@@ -1213,7 +1219,7 @@ for all $j=1,\dots,s$.
 \end{enumerate}
 \end{lemma}
 
-We are heading towards the implicit Runge-Kutta methods and try to motivate it.
+We are heading towards the implicit Runge-Kutta methods and try to motivate them.
 
 Since in the implicit case the matrix $A$ has more non-zero entries, we have more conditions to our method. We seek to find out if it is possible to use the additional coefficients of an implicit Runge-Kutta method to obtain a higher order for a given number $s$ of stages. In the explicit case, theorem II.12 shows that for the order of consistency $p$ it holds $p\leq s$, so we want to find out if it is possible that $p>s$ for a implicit Runge-Kutta method.
 
@@ -1230,7 +1236,7 @@ for $j=1,\dots,s$.
 
 A \textbf{collocation method} consists of finding such a $u_s$ and setting $y_{i+1} = u(t_{i+1})$.
 
-But we do not yet know, what the relation to a Runge-Kutta method is.
+But we do not yet know what the relation to a Runge-Kutta method is.
 
 \begin{lemma}
 The collocation method defined by (II.10) is equivalent to a $s$ stage implicit Runge-Kutta method with the coefficients
@@ -1262,16 +1268,16 @@ r_j = u_s'(t_i+c_j\Delta t)\overset{\text{(II.10)}}{=} f\Big(t_i+c_j\Delta t,~u_
 \]
 we obtain
 \[
-u_s(t_i+c_j\Delta t) = u_s(t_i) + \Delta t \sum_{\ell=1}^{s }a_{j\ell} f\Big(t_i+c_j\Delta t,~u_s(t_i+c_j\Delta t)\Big),\tag{$\star$}
+u_s(t_i+c_j\Delta t) = u_s(t_i) + \Delta t \sum_{\ell=1}^{s }a_{j\ell} f\Big(t_i+c_j\Delta t,~u_s(t_i+c_j\Delta t)\Big),\tag{$\ast$}
 \]
 or
 \[
-u_s(t_i+\Delta t) = u_s(t_i) + \Delta t \sum_{j=1}^{s }b_j f\Big(t_i+c_j\Delta t,~u_s(t_i+c_j\Delta t)\Big). \tag{$\star\star$}
+u_s(t_i+\Delta t) = u_s(t_i) + \Delta t \sum_{j=1}^{s }b_j f\Big(t_i+c_j\Delta t,~u_s(t_i+c_j\Delta t)\Big). \tag{$\ast\ast$}
 \]
-Since in the collocation method we set $u_s(t_i)= y_i$ and $u_s(t_{i+1})=y_{i+1}$, we have the Runge-Kutta method in ($\star$) and ($\star\star$).
+Since in the collocation method we set $u_s(t_i)= y_i$ and $u_s(t_{i+1})=y_{i+1}$, we have the Runge-Kutta method in ($\ast$) and ($\ast\ast$).
 \end{proof}
 
-We do not know yet, if every Runge-Kutta method originates in collocation. In general, this is not true, as the following example demonstrates: Consider the two stage Runge-Kutta method with $c_1=0,~c_2=\tfrac{2}{3}$. Computing $L_1,L_2$ and $a_{ji},b_i$ via (II.11) and (II.12) will give
+We do not know yet if every Runge-Kutta method originates in collocation. In general, this is not true, as the following example demonstrates: Consider the two stage Runge-Kutta method with $c_1=0,~c_2=\tfrac{2}{3}$. Computing $L_1,L_2$ and $a_{ji},b_i$ via (II.11) and (II.12) will give
 \[
 \begin{matrix}[c|cc]
      0 & 0 & 0 \\
@@ -1288,6 +1294,179 @@ Given that every choice of collocation points corresponds to an unique collocati
 \end{matrix}
 \]
 with order $p\geq 3$ has no collocation counterpart.
+
+\begin{example}
+For $s=1$ the polynomial defined by
+\[
+u(t) = y_i + (t-t_i)f(t_i+c_1\Delta t,~u(t_1+c_1\Delta t))
+\]
+gives a collocation method like in (II.10). For $c_1 = 0$ it gives the explicit Euler method, for $c_1 = 1$ it gives the implicit Euler method and for $c_1=\teinhalb$ the midpoint rule is given. {\rot \texttt{The drawing is missing.}}
+\end{example}
+
+We want to know how the order $p$ of an implicit Runge-Kutta method depends on the choice of the collocation method. To answer this question reconsider (II.1), i.e. the ODE
+\[
+y'(t) = f(t,y(t))
+\]
+and let $v$ be a "candidate" solution. The defect is defined as
+\[
+d(t,v) = v'(t) - f(t,v(t)). \tag{II.13}
+\]
+When the defect is small, the error $\norm{y(t) = v(t)}$ is small too, because if $d(t,v)=0$ our candidate $v$ is the solution.
+
+Let us consider the linear case
+\[
+y' = \Lambda y~, y(t_0)=y_0.
+\]
+Then the defect is given by
+\[
+D(t) = v'(t) - \Lambda v(t).
+\]
+Plugging in for our candidate solution $v$ we thus arrive at the linear inhomogeneous ODE
+\[
+v'(t) = \Lambda v(t) + D(t), ~t\geq t_0, ~v(t_0) \textrm{ given.}
+\]
+The exact solution of this ODE (theorem I.12) is given by
+\[
+v(t) = e^{(t-t_0)\Lambda} + \int_{t_0}^{t }e^{(t-\tau)\Lambda} D(\tau)~d\tau
+\]
+wheras the solution of (II.13) is given by
+\[
+y(t) = e^{(t-t_0)\Lambda}y_0 ~ t\geq t_0.
+\]
+Hence
+\begin{align*}
+v(t) - y(t)
+& = e^{(t-t_0)\Lambda}(v_0-y_0) + \int_{t_0}^{t}e^{(t-\tau)\Lambda}D(\tau)~d(\tau)
+\end{align*}
+for $t\geq t_0$. Thus, the error can be controlled by the observables $v_0, y_0$ and the defect $D(\tau)$.
+
+\begin{theorem}[Alekseenz-Gröbner-Lemma]
+Let $v$ be a smoothly differentiable function that obeys the initial conditions $v(t_0)=y_0$. Then
+\[
+v(t) - y(t) = \int_{t_0}^{t }\Xi(t,\tau)d(\tau,v)~d\tau,  ~~~t\geq t_0,
+\]
+where $\Xi$ is the matrix of the partial derivatives of the solution of the ODE
+\[
+w'=f(t,w),~w(\tau)=v(\tau).
+\]
+\end{theorem}
+\begin{proof}
+The proof can be found in \textit{Deuflhard-Bornemann, Numerical Mathematics, Chapter III, Theorem 3.4} and is not given in this lecture.
+\end{proof}
+
+\newpage
+\subsubsection*{\underline{Excursion II.2} (Quadrature)}
+\definecolor{shadethmcolor}{HTML}{F6FDFF}
+
+\begin{exdef}
+A quadrature rule $Q_{n+1}[f]$ is exact of order $n\in\N$ if
+\[
+R_n[p] = I[p] - Q_{n+1}[p] = 0
+\]
+holds for all $p \in \P_{n+1}$.
+\end{exdef}
+Recall that the scalar product of to functions is given by
+\[
+\scal{f}{g} = \int_{a }^{b }f(x)g(x)w(x)~dx,
+\]
+where $w(x)$ is a weight-function.
+\begin{exthm}
+Let $r=\P_s$ obey
+\[
+\scal{r}{p} = 0
+\]
+for every $p\in \P_s$ and
+\[
+\scal{r}{t^s} \neq 0.
+\]
+Let $c_1,\dots,c_s$ be the zeros of the polynomial $r$ and choose $b_1,\dots,b_s$ such that
+\[
+\sum_{j=1}^{s }b_j c_j^{s-1} = \int_{a }^{b }\tau^{s-1}~d\tau.
+\]
+Then the quadrature rule has exactness of order $2s$.
+\end{exthm}
+\newpage
+
+\definecolor{shadethmcolor}{HTML}{EEEEEE}
+
+\begin{theorem}
+An implicit Runge method $(A,b,c)$ generated by the collocation method (II.10) has for $f\in C^p(\R\times\R^d,\R^d)$ the consistency order $2s$ if and only if the quadrature formula defined by the nodes $c$ and weights $b$ meet the requirements of the previous excursion theorem, i.e. if it is of order $2s$.
+\end{theorem}
+\begin{proof}
+We only give a scetch of the proof. Use theorem II.15 and $u(t_i)=y_i$, where $y_{i+1}$ is the solution of the collocation method and $y(t_{i+1})$ is the true solution. We obtain
+\[
+y_{i+1}-y(t_{i+1}) = \int_{t_i}^{t_{i+1}}\Xi(t_{i+1},\tau)d(\tau,u)~d\tau.
+\]
+Applying a quadrature rule with $w(t)=1$ and the quadrature points $t_i+c_1\Delta t, \dots, t_i + c_s\Delta t$ leads to
+\[
+y_\ipo - y(t_\ipo) = \sum_{j=1}^{s } b_j d(t_i+c_j\Delta t, u) + \textrm{error of quadrature from (II.14)}.
+\]
+According to (II.10) it holds
+\begin{align*}
+d(t_i+c_j\Delta t, u)
+& =  u'(t_i+c_j\Delta t) - f(t_i+c_j\Delta t, u(t_i+c_j\Delta t))\\
+{\tiny\textrm{(II.10)}} & = 0.
+\end{align*}
+Thus, according to excursion theorem the order of quadrature with the weight functions $w(t)=1, ~0\leq t \leq 1$ and $c_1,\dots, c_s$ is $2s$.
+\end{proof}
+
+We have seen that for an explicit Runge-Kutta method it is not possible to choose $p>s$. However, when dealing with implicit Runge-Kutta methods, by a suitable choice of $c_i,a_{ji}$ the implicit Runge-Kutta method can be reffered to as a collocation method. The theorem of Alekseenz-Gröbner tells us that
+\[
+y_\ipo - y(t_\ipo) \leq \textrm{quadrature error with certain exactness.}
+\]
+So if we choose the $c_j$ such that they refer to an implicit Runge-Kutta method and also have an quadrature error of order $2s$, then we can obtain up to $p\leq 2s$.
+
+\begin{example}[Gauß-Legendre Runge-Kutta method]
+$s$-stage, order $2s$ methods, choose $c_1,\dots,c_s\in(0,1)$ as zeros of the Legendre polynomial $p_s$ given by
+\[
+p_s(t) = \frac{(s!)^2}{(2s)!} \cdot \sum_{k=0}^{s} (-1)^k \binom{s}{k} \binom{s+k}{k}t^k.
+\]
+For $s=1$ we get
+\[
+p_1(t) = t- \teinhalb,
+\]
+so $c_1 = \teinhalb$ and the Butcher table is
+\[
+\begin{matrix}[c|c]
+    \teinhalb & \teinhalb \\\hline & 1
+\end{matrix}~~.
+\]
+For $s=2$ we have
+\[
+p_1(t)=t^2 -t + \tfrac{1}{6},
+\]
+so $c_1 = \tfrac{1}{2} - \tfrac{\sqrt{3}}{6}$ and $c_2=\tfrac{1}{2}+\tfrac{\sqrt{3}}{6}$ and by (II.11) and (II.12) from theorem (II.14) we have the Butcher table given by
+\[
+\begin{matrix}[c|cc]
+\teinhalb - \tfrac{\sqrt{3}}{6} & \tfrac{1}{4} & \tfrac{1}{4}-\tfrac{\sqrt{3}}{6} \\
+\teinhalb + \tfrac{\sqrt{3}}{6} & \tfrac{1}{4} - \tfrac{\sqrt{3}}{6} & \tfrac{1}{4} \\\hline
+& \tfrac{1}{2} & \tfrac{1}{2}
+\end{matrix}~~.
+\]
+\end{example}
+
+From Lemma II.10 we already know that Butcher trees are a method for finding the conditions on $(A,b,c)$ for reaching a certain order of an explicit Runge-Kutta method.  The order of a tree is defined as the number of nodes in the tree. It grows exponentially in the treesize. {\rot \texttt{The tree drawings are missing.}} We have the polynomial $\Phi$ defined by
+\[
+\Phi(t) = \sum_{i,j} b_i c_i^2 a_{ij} c_j^2
+\]
+and $\gamma(t) \in \N\ohnenull$ by $\dots$ We obtain the following table:
+
+
+\centering{
+\begin{tabular}{cccc}
+tree & order & $\gamma$ & condition \\ \hline
+(a) & 1 & 1 & $\sum_{i} b_i = 1$ \\
+(b) & 2 & 2 & $\sum_{i} b_i c_i = \teinhalb = \tfrac{1}{\gamma(t)}$ \\
+(c) & 3 & 3 & $\sum_{i} b_i c_i^s = \tfrac{1}{3}$
+\end{tabular}.}
+
+
+
+
+
+
+
+
 
 
 
