@@ -19,6 +19,7 @@
 \endgroup
 
 %\newcommand{\qed}{\hfill $\Box$}
+\newcommand{\real}{\textrm{Re}}
 \newcommand{\limn}{\lim_{n \to \infty}}
 \newcommand{\einhalb}{\frac{1}{2}}
 \newcommand{\teinhalb}{\tfrac{1}{2}}
@@ -47,6 +48,7 @@
 \newcommand{\ipo}{{i+1}}
 \newcommand{\partiell}[2]{\frac{\partial #1}{\partial #2}}
 \newcommand{\nhn}{\newline\hfill\newline}
+\newcommand{\inv}{^{-1}}
 \renewcommand{\l}{\left}
 \renewcommand{\r}{\right}
 \renewcommand{\P}{\mathbb{P}}
@@ -1452,13 +1454,223 @@ From Lemma II.10 we already know that Butcher trees are a method for finding the
 and $\gamma(t) \in \N\ohnenull$ by $\dots$ We obtain the following table:
 
 
-\centering{
-\begin{tabular}{cccc}
+{\hfill\begin{tabular}{cccc}
 tree & order & $\gamma$ & condition \\ \hline
 (a) & 1 & 1 & $\sum_{i} b_i = 1$ \\
 (b) & 2 & 2 & $\sum_{i} b_i c_i = \teinhalb = \tfrac{1}{\gamma(t)}$ \\
 (c) & 3 & 3 & $\sum_{i} b_i c_i^s = \tfrac{1}{3}$
-\end{tabular}.}
+\end{tabular}.\hfill}
+
+\subsubsection*{Stability (A Stability)}
+Looking at the explicit Euler method for the solution of the IVP
+\[
+y'(t) = -20 y(t), ~ y(0)=1.2
+\]
+one can observe oscillation for large $t$. This motivates the definition of stability of a numerical scheme.
+
+Consider a vector valued IVP given by
+\begin{equation}
+    \begin{aligned}
+        y'(t) & = f(t,y(t)) \\
+        y(0) & = \hat y_0
+    \end{aligned} \tag{II.15}
+\end{equation}
+We want to know what happens with small perturbations of $u_i$ at some $t_i$. We have
+\[
+(y+u)'(t) = f(t,(y+u)(t))
+\]
+with
+\[
+(y+u)(t_i) = y(t_i) + u_i
+\]
+for $t\geq t_i$. Using Taylor expansion gives
+\begin{align*}
+u'(t) & = (y+u)'(t) - y'(t) \\
+& = f(t,(y+u)(t)) - f(t,y(t)) \\
+& \approx f(t,y(t)) + \partiell{f}{y}(t,y(t)) \cdot u(t) - f(t,y(t)) \\
+& = \partiell{f}{y} (t,y(t))\cdot u(t).
+\end{align*}
+Freezing the matrix $\partiell{f}{y} (t,y(t))$ at $t_i$ we obtain a linear system of ODEs with constant coefficients:
+\begin{align*}
+u'(t) & = \partiell{f}{y} (t,y(t_i)) \cdot u(t)
+\end{align*}
+or
+\begin{align*}
+u'(t) & = A u(t),
+\end{align*}
+where $A$ is a matrix.
+
+Remember, that for an $A\in\C^{n,n}$ the ODE
+\[
+y'(t) = A y(t) \tag{$\ast$}
+\]
+has for $n=1$ the solution
+\[
+y(t) = y(t_0)e^{at},
+\]
+where $a=A$. Using this as an Ansatz for ($\ast$) we obtain
+\[
+y(t) = v e^{\lambda t},~\lambda\in \C, v\in\C^n.
+\]
+Hence, $y(t)=ve^{\lambda t}$ solves ($\ast$) if and only if $\lambda$ is an eigenvalue of $A$ and $v$ is an eigenvector of $A$, since
+\[
+\lambda v e^{\lambda t} = A v e^{\lambda t}.
+\]
+
+From Analysis II, recall that if $A$ is diagonalizable, then the matrix
+\[
+Y = (v_1 e^{\lambda_1},\dots,v_n e^{\lambda_n})
+\]
+is the fundamental matrix of $y'(t) = Ay(t)$. \newline
+
+\noindent Heading back, this means that
+\[
+u(t) = c_1v_1 e^{\lambda_1 t } + \dots + c_n v_n e^{\lambda_n t},
+\]
+where $\lambda_i$ are eigenvalues and $v_i$ are eigenvectors. If $\real(\lambda_i)<0$, then it holds
+\[
+\lim_{t\to\infty} u(t) = 0.
+\]
+In this case, we consider the IVP as moderate, since small local perturbations fall off.\footnote{Note, that for sakes of simplicity we assumed pairwise different eigenvalues. However, above standing considerations also hold for multiple eigenvalues.}
+
+We thus consider the scalar test problem
+\[
+\begin{aligned}
+    y'(t) & = \lambda y(t) \\
+    y(0) & = 1.
+\end{aligned}\tag{II.D}
+\]
+This problem is called the \textbf{Dahlquist Test-Problem}.
+
+\begin{definition}[A-stability]
+We call a numerical method \textbf{A-stable} (absolute stable) if its approximates $y_i$ of (II.D) for each $\lambda \in \C^-=\l\{\lambda\in\C ~|~ \real(\lambda)<0\r\}$ with arbitrary but fixed $\Delta t$ are contractive, i.e. if
+\[
+|y_{i+1}| < |y_i| \tag{II.16}
+\]
+for all $i\in\N$
+\end{definition}
+
+\begin{example}
+\hfill
+\begin{enumerate}[(a)]
+    \item The explicit Euler method was given by $y_{i+1} = y_i + \Delta t f(t_i,y(t_i))$. Applying this on (II.D) we obtain
+    \begin{align*}
+    y_{i+1} & = y_i + \Delta t \cdot\lambda\cdot y_i \\
+    & = (1+\Delta t\lambda) y_i,
+    \end{align*}
+    so we have to choose $\lambda \Delta t \in \l\{z\in\C~|~|z+1|<1\r\}$, since otherwise $(1+\Delta t \cdot \lambda)\not< 1$. Hence, the explicit Euler method is \textbf{not stable}.
+
+    \item The implicit Euler method was given by $y_{i+1}=y_i+\Delta t f(t_{i+1},y_{i+1})$. Applying this to (II.D) yields
+    \begin{align*}
+    y(t_{i+1}) = y_i + \Delta t \cdot \lambda y_{i+1},
+    \end{align*}
+    or equivalently
+    \[
+    y_{i+1} = \einsdurch{(1-\Delta t \lambda)} y_i.
+    \]
+    Hence, the implicit Euler method is A-stable.
+
+    \item For the Runge-Kutta methods we have
+    \[
+    y_{i+1} = y_i + \Delta t \sum_{j=1}^{s }b_j f(t_i+c_j\Delta t, k_j).
+    \]
+    Applying this to (II.D) yields
+    \[
+    y_i + \Delta t \lambda \sum_{j=1}^{s }b_j k_j.
+    \]
+    Remember that $k_j$ was given by
+    \[
+    k_j = y_i + \Delta t \sum_{\nu=1}^{s }a_{j\nu}f(t_i+c_j\Delta t,k_\nu) \overset{\tiny\textrm{(II.D)}}{=}y_i + \Delta t \lambda \sum_{\nu=1}^{s }a_{j\nu} b_j.
+    \]
+    Rewriting with
+    \[
+    k= \begin{bmatrix} k_1 & \cdots & k_s \end{bmatrix}^T, ~ e=\begin{bmatrix} 1 & \cdots & 1 \end{bmatrix}^T\in\R^s
+    \]
+    gives $k=y_i e + \Delta t A k$, where $A=[a_{j\nu}]$. This is equivalent to
+    \[
+    (I_s - \Delta t \lambda A)k = y_i e.
+    \]
+    By assuming that $\einsdurch{\Delta t k}\not\in \sigma(A)$, where $\sigma(A)$ is the spectrum of $A$, it holds
+    \[
+    k=(I_s-\Delta t \lambda A)\inv y_i e.
+    \]
+    With this, we obtain
+    \begin{align*}
+    y_{i+1}
+    & = y_i+\Delta t \lambda b^T k \\
+    & = y_i + \Delta t \lambda b^T (I_s - \Delta t \lambda A)\inv y_i e \\
+    & = \underbrace{\l(1+\Delta t \lambda b^T \l(I_s - \Delta t \lambda A\r)\inv e \r)}_{=:R(\lambda\Delta t)}y_i.
+    \end{align*}
+\end{enumerate}
+\end{example}
+
+The observation for Runge-Kutta methods motivates the following definition.
+
+\begin{definition}[Stability function of Runge-Kutta methods]
+For $\hat\sigma(A)=\l\{\lambda\in\C\ohnenull ~|~ \lambda\inv \in \sigma(A)\r\}$ we call the mapping
+\[
+R: \C\setminus \hat\sigma(A) \to \C, ~~\xi\mapsto R(\xi)=1+\xi b^T (I_s-\xi A)\inv e
+\]
+\textbf{stability function of the Runge-Kutta method} defined by $(A,b,c)$.
+\end{definition}
+
+\begin{theorem}
+A Runge-Kutta method is A-stable if and only if $|R(\xi)|<1$ for $\xi \in \C^-$, where $R$ is its stability function.
+\end{theorem}
+\begin{proof}
+No proof.
+\end{proof}
+
+We want to know how exactly the stability function of a Runge-Kutta method looks like, if we consider explicit or implicit Runge-Kutta methods.
+
+\begin{theorem}
+The stability function of a Runge-Kutta method given by $(A,b,c)$ is
+\begin{enumerate}[(a)]
+    \item a polynomial of degree less or equal $s$ in the case of an explicit RKM and
+    \item a rational function, which possibly contains the inverse of the eigenvalues of $A$ as poles in the case of an implicit RKM.
+\end{enumerate}
+\end{theorem}
+\begin{proof}
+\hfill
+\begin{enumerate}[{ad} (a).]
+    \item $A\in\R^{s,s}$ is a strictly lower triangular matrix, hence $A^s = 0$. We consider the Neumann series given by
+    \[
+    (I_s - \xi A)^{-1} = I_s + \xi A + \dots + \xi^{s-1} A^{s-1}
+    \]
+    such that
+    \[
+    R(\xi) = 1 + \xi b^T (I_s \xi A)\inv e = 1+b^T(\xi I_s + \dots +\xi^s A^{s-1})e
+    \]
+    is a polynomial.
+    \item We solve the linear system $(I-\xi A)v = e$ by using Cramer's rule and obtain
+    \begin{align*}
+    v_j & = \frac{\det \Big( (I-\xi A)_1, \cdots\!, e, \cdots\!, (I-\xi A)_s \Big)}{\det (I-\xi A)}\\
+    & = \frac{p_j(\xi)}{\det(I-\xi A)},
+    \end{align*}
+    with $p_j\in\P_{s-1}$. Thus, we have
+    \[
+    R(\xi) = 1 + \frac{\sum_{j=1}^{s}b_j p_j(\xi)}{\det(I-\xi A)}\cdot \xi,
+    \]
+    what ends the proof.
+\end{enumerate}
+\end{proof}
+
+\begin{theorem}
+There exists no A-stable explicit Runge-Kutta method.
+\end{theorem}
+\begin{proof}
+In the explicit case we have $\lim_{|\xi|\to\infty} R(\xi) = \infty$.
+\end{proof}
+
+
+
+
+
+
+
+
+
+
 
 
 
