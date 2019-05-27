@@ -1662,10 +1662,116 @@ There exists no A-stable explicit Runge-Kutta method.
 In the explicit case we have $\lim_{|\xi|\to\infty} R(\xi) = \infty$.
 \end{proof}
 
+We have thus seen that for explicit RKM the stepsize can not be chosen arbitray. So we seek for $\Delta t$ such that $|R(\lambda \Delta t)|<1$. This leads us to the next definition.
 
+\begin{definition}[Domain of stability]
+The set $S:= \l\{\xi \in \C ~|~ |R(\xi)|<1 \r\}$ is called the \textbf{domain of stability} of the RKM belonging to $R$.
+\end{definition}
 
+There might be some scenarios where the usage of a constant $\Delta t$ might be suboptimal, since the solution can behave very differently at different times. Thus, in the following, we are not going to assume that $\Delta t$ is constant. Not only the discretization error, but also the \textbf{rounding error} is important. When, by rounding, we obtain $\tilde{y_i}$ instead of $y_i$, the rounding error is given by
+\[
+|y_i - \tilde y_i| = O \l(\frac{\varepsilon}{\Delta t}\r).
+\]
+The discretization error is given by
+\[
+|y(t_i) - y_i| = O(\Delta t^p).
+\]
+Since the rounding error rises as $\Delta t \to 0$ and the discretization error rises as $\Delta t \to \infty$, we want to know if there exists an optimal stepsize $t_{\textrm{opt}}$.
 
+But how is it possible to find a suitable step size, when the exact solution is unknown? Let $y_i$ be an approximation of $O(\Delta t^p)$ and $\tilde y_i$ be an approximation of $O(\Delta t^q)$ where $q>p$. Then we have\footnote{Note that $y(t_i)$ is unknown.}
+\[
+\norm{y(t_i) - y_i} \leq \norm{y(t_i)-\tilde y_i} + \norm{\tilde y_i + y_i} = O(\Delta t^q) + \norm{\tilde y_i - y_i}
+\]
+and hence $O(\Delta t^q) + \norm{\tilde y_i - y_i}$ is an estimator for the exact solution of order $q$.
 
+Consider an equidistant grid of points and a one-step method
+\[
+\begin{aligned}
+y_{\Delta t}(t+\Delta t) & = y_{\Delta t}(t) + \Delta t \Phi(t,y_{\Delta t}(t),\Delta t) \\
+y_{\Delta t}(t_0) &= y_0
+\end{aligned}\tag{II.16}
+\]
+with order of consistency $p\in\N$ and local error (Def II.2)
+\[
+\eta(t+\Delta t) = y(t) - \Delta t \Phi\big( t,y(t),\Delta t \big) - y(t+\Delta t) = O(\Delta t^{p+1}).\tag{II.17}
+\]
+If $\Phi$ is sufficiently often differentiable, we can expand the error and obtain
+\[
+\eta(t,\Delta t) = \sum_{i=p+1}^{N+1}g_i(t) \Delta t^i + O(\Delta t^{N+2}). \tag{II.18}
+\]
+The next theorem shows that a similar expansion is possible for the global error $e(t,\Delta t)$.
+
+\begin{theorem}[Gregg]
+Let $f(t,y)$ and $\Phi$ be sufficiently often continuously differentiable on $S=\l\{(t,y) ~|~ t_0 \leq t \leq t_{\textrm{end}},~y\in\R^d\r\}$ and let us assume that the local error $\eta$ has the expansion (II.18). Then the global error $e(t,\Delta t)$ oafter $n$-steps with stepsize $\Delta t$ has in $t^*=t_0 + n\Delta t$ has an asymptotic expansion of the form
+\[
+e(t,\Delta t) = e_p(t^*)\Delta t^p + e_{p+1}(t^*)\Delta t^{p+1} + \dots + e_N(t^*)\Delta t^N + E_{N+1} (t^*,\Delta t) \Delta t^{N+1},
+\]
+where the remainder $E_{N+1}(t^*,\Delta t)$ is bounded for $0<\Delta t < \Delta t_0$.
+\end{theorem}
+\begin{proof}
+Observe that
+\[
+y(t+\Delta t) = y(t) + \int_{t }^{t+\Delta t}f(\tau,y(\tau ))~d\tau \rightsquigarrow y_{\Delta t} (t+\Delta t) = y(t) + \Delta t\Phi(t,y(t),\Delta t),
+\]
+where
+\[
+\Phi(t,y(t),\Delta t) = \einsdurch{\Delta t} \int_{t }^{t+ \Delta t }f(\tau, y(\tau))~d\tau - \frac{\eta(t,\Delta t)}{\Delta t}.
+\]
+We now set
+\[
+\Phi_y(t,y(t),\Delta t) = f_y(t,y)d\tau + O(\Delta t) \tag{II.19}.
+\]
+We construct a method of order $p+1$ such that
+\[
+y(t) - y_{\Delta t} (t) = e_p(t) \Delta t^p + O(\Delta t^{p+1}).
+\]
+We set
+\[
+\bar y_{\Delta t}(t) = e_p(t)\Delta t^p + y_{\Delta t}(t) \tag{II.20}.
+\]
+For the "new" one step method we thus have
+\[
+\begin{aligned}
+\bar y_{\Delta t}(t+\Delta t) &= \bar y_{\Delta t} (t) + \Delta t \bar\Phi \l(t, \bar y_{\Delta t}(t), \Delta t\r) \\ \bar y_{\Delta t} (t_0) & = y_0.
+\end{aligned} \tag{II.21}
+\]
+We then have
+\begin{align*}
+\bar y_{\Delta t}(t+\Delta t) &\overset{\textrm{(II.20)}}{=} e_p(t+\Delta t) \Delta t^p + y_{\Delta t}(t + \Delta t) + O(\Delta t^{p+1}) \\
+& \overset{\textrm{(II.16)}}{=} e_p(t+\Delta t) \Delta t^p + y_{\Delta t}(t) + \Delta t \Phi(t,y(t),\Delta t)  + O(\Delta t^{p+1})\\
+& ~~~\!=~~ e_p(t+\Delta t)\Delta t^p \overset{\textrm{(II.20)}}{+} \bar y_{\Delta t}(t) - e_p(t) \Delta t^p \\ & ~~~~~~+ \Delta t \Phi\Big(t,\bar y_{\Delta t}(t) - e_p(t)\Delta t,\Delta t\Big)  + O(\Delta t^{p+1})\\
+& ~~~\!=~~ \bar y_{\Delta t}(t) + \Delta t \Phi\Big(t,\bar y_{\Delta t}(t) - e_p(t)\Delta t, \Delta t\Big) \\ & ~~~~~~+ \Big( e_p(t+\Delta t) - e_p(t) \Big)\cdot \Delta t^{p} + O(\Delta t^{p+1}).
+\end{align*}
+Comparing (II.21) with this result gives
+\[
+\Phi\Big(t,y_{\Delta t}(t) - e_p(t)\Delta t, \Delta t\Big) + \Big( e_p(t+\Delta t) - e_p(t) \Big)\Delta t^{p-1} = \bar \Phi ( t, y_{\Delta t}(t),\Delta t).
+\]
+For $\bar \eta$ it holds
+\begin{align*}
+\bar \eta (t,\Delta t)
+& = y(t) + \Delta t \bar \Phi(t,y(t),\Delta t) - y(t+\Delta t) \\
+& = y(t) + \Delta t \Phi\Big(t,y(t)-e_p(t)\Delta t^p, \Delta t\Big) \\
+& ~~~+ \Big(e_p(t+\Delta t) - e_p(t)\Big) \Delta t^p - y(t+\Delta t) + O(\Delta t^{p+1}) \\
+& = y(t) + \Delta t \Phi\Big(t,y(t)-e_p(t)\Delta t^p, \Delta t\Big) +  e_p' \Delta t^{p+1} - y(t+\Delta t) + O(\Delta t^{p+1}) \\
+& = y(t) + \Delta t \Phi\big(t,y(t),\Delta t\big)-f_y(t,y)\cdot e_p(t)\Delta t^{p+1} \\
+& ~~~+  e_p'(t) \Delta t^{p+1} - y(t+\Delta t) + O(\Delta t^{p+1}) \\
+& = \Delta t^{p+1} \Big( g_{p+1}(t) + e_p'(t) - f_y(t,y(t)) e_p(t) \Big) + O(\Delta t^{p+2})
+\end{align*}
+and thus the method (II.21) has order of consistency $p+1$, if $e_p(t)$ solves the IVP
+\begin{align*}
+e_p(t) & = f_y(t,y(t)) e_p(t) + g_{p+1}(t) \\
+e_p(t_0) & = 0.
+\end{align*}
+For the global error of (II.21) it holds (according to theorem II.7)
+\[
+y(t^*) - \bar y_{\Delta t}(t^*) = E_{p+1}(t,\Delta t) \Delta t^{p+1}
+\]
+and with (II.20) it holds
+\[
+e(t^*,\Delta t) = e_p(t^*)\Delta t^p + E_{p+1} (t^*,\Delta t)\Delta t^{p+1}.
+\]
+For the next step $e_{p+1}(t)$ we start the proof at (II.21).
+\end{proof}
 
 
 
