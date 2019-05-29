@@ -43,6 +43,7 @@
 \newcommand{\grad}{\text{grad}~}
 \newcommand{\gdw}{\Leftrightarrow}
 \newcommand{\rot}{\color{red}}
+\newcommand{\gr}{\color{green}}
 \newcommand{\blau}{\color{blue}}
 \newcommand{\rank}{\text{rank}}
 \newcommand{\ipo}{{i+1}}
@@ -1773,24 +1774,155 @@ e(t^*,\Delta t) = e_p(t^*)\Delta t^p + E_{p+1} (t^*,\Delta t)\Delta t^{p+1}.
 For the next step $e_{p+1}(t)$ we start the proof at (II.21).
 \end{proof}
 
+With theorem II.23 in our hands, we can
+\begin{enumerate}[(a)]
+    \item construct a method of higher order and
+    \item construct an error estimator for the global error.
+\end{enumerate}
+\begin{enumerate}[{ad} (a):]
+    \item Let
+        \begin{align*}
+        y_{i+1}^{\Delta t}&, ~\textrm{stepsize}~ \Delta t, ~ 1 \textrm{ step}\\
+        y_{i+1}^{\Delta t/2}&, ~\textrm{stepsize}~ \frac{\Delta t}{2}, ~ 2 \textrm{ step}
+        \end{align*}
+        be methods on $[t_i,t_{i+1})$. Then, according to theorem II.23 it holds
+        \[
+        \begin{aligned}
+        y(t_{i+1}) & = y_{i+1}^{\Delta t} + e_p(t_{i+1}) \Delta t^p + O(\Delta t^{p+1}) \\
+        y(t_{i+1}) & = y_{i+1}^{\Delta t/2} + e_p(t_{i+1}) \frac{\Delta t}{2}^p + O(\Delta t^{p+1}).
+        \end{aligned} \tag{II.23}
+        \]
+        Thus, substracting $(\tfrac{1}{2})^p$ times the first line from the second line, we get
+        \[
+        y(t_\ipo) - \l(\frac{1}{2}\r)^p y(t_\ipo) = y_\ipo^{\Delta t/2} - \l(\frac{1}{2}\r)^p y_\ipo^{\Delta t} + O(\Delta t^{p+1})
+        \]
+        and hence
+        \[
+        y(t_{i+1}) = \frac{y_\ipo^{\Delta t/2} - \l(\frac{1}{2}\r)^p y_\ipo^{\Delta t}}{1-\l(\frac{1}{2}\r)^p} + O(\Delta t^{p+1}).
+        \]
+        Thus,
+        \[
+        \tilde y_{i+1}^{\Delta t} = \frac{y_\ipo^{\Delta t/2} - \l(\frac{1}{2}\r)^p y_\ipo^{\Delta t}}{1-\l(\frac{1}{2}\r)^p} + O(\Delta t^{p+1})
+        \]
+        is an $O(\Delta t^{p+1})$ approximation of $y(t_{i+1})$.
+    \item Using (II.23) and substracting the second line from the first line, we get
+    \[
+    O(\Delta t^{p+1}) + \frac{y_\ipo^{\Delta t}-y_\ipo^{\Delta t/2}}{1-\l(\frac{1}{2}\r)^p} = e_p(t_i) \Delta t^p.
+    \]
+    Setting
+    \[
+    \textrm{EST}_\ipo^{(\textrm{g})} = \frac{ \norm{ y_{i+1}^{\Delta t}-y_\ipo^{\Delta t/2}}}{1-\l(\frac{1}{2}\r)^p}, \tag{II.24}
+    \]
+    for some given tolerance $\textrm{TOL}$ of the global error, we can choose a suitable stepsize, by computing $y_\ipo^{\Delta t}$ and $y_\ipo^{\Delta t/2}$ and then
+    \begin{itemize}
+        \item increase $\Delta t$, if $\textrm{EST}_\ipo^{(\textrm{g})} \leq \textrm{TOL}$ and
+        \item decrease $\Delta t$, if $\textrm{EST}_\ipo^{(\textrm{g})} \geq \textrm{TOL}$.
+    \end{itemize}
+\end{enumerate}
 
+To derive an estimator of the local error, first observe that $\Delta t$ is not constant, i.e. we write $\Delta t_i$ instead of $\Delta t$. Hence, we want to adjust the time step size according to the local behaviour of the solution. This is why we need an estimate.
 
+Consider a explicit one step method $\Phi$, once with stepsize $\Delta t$ (we denote the outcome by $y_\ipo^{\Delta t}$) and once with stepsize $\Delta t/2$ (we denote the outcome by $\bar y_\ipo^{\Delta t}$. Then,
+\[
+\bar y_\ipo^{\Delta t} = y_i^{\Delta t} + \frac{\Delta t}{2} \Phi\l(t_i,y_i^{\Delta t},\frac{\Delta t}{2}\r) + \frac{\Delta t}{2} \Phi \l( t_i+\frac{\Delta t}{2}, y_i^{\Delta t}+\Delta t \Phi \l(t_i, y_i^{\Delta t}, \frac{\Delta t}{2}\r), \frac{\Delta t}{2} \r).
+\]
+By (II.18), we know that the local error $\eta(t,\Delta t)=O(\Delta t^{p+1})$ can be written as
+\[
+\eta(t,\Delta t) = g_{p+1}(t)\Delta t^{p+1} + O(\Delta t^{p+2}).
+\]
+Thus, it holds
+\[
+\bar \eta(t_i,\Delta t) = g_{p+1}(t_i) \cdot \l(\frac{1}{2}\r)^{p+1} + g_{p+1} \l(t_i+\frac{\Delta t}{2}\r) \l(\frac{\Delta t}{2}\r)^{p+1} + O(\Delta t^{p+2})
+\]
+and using a Taylor-expansion in the middle part gives
+\[
+g_{p+1} \l(t_i+\frac{\Delta t}{2}\r) \l(\frac{\Delta t}{2}\r)^{p+1} = g_{p+1} (t_i) \l(\frac{\Delta t}{2}\r)^{p+1} + O(\Delta t^{p+2}).
+\]
+Hence, we have
+\[
+\bar \eta(t_i,\Delta t) = 2 g_{p+1}(t_i) \l(\frac{\Delta t}{2}\r)^{p+1} + O(\Delta t^{p+1}) = \l(\einhalb\r)^p \underbrace{g_{p+1}(t_i) \Delta t^{p+1}}_{=\eta(t,\Delta t)} + O(\Delta t^{p+2}). \tag{$\ast$}
+\]
+So it holds
+\begin{align*}
+y(t_\ipo) & = \bar y_\ipo + \bar \eta(t_i,\Delta t) + O(\Delta t^{p+2}) \\
+y(t_\ipo) & = y_{i+1} + \eta (t_i,\Delta t) + O(\Delta t^{p+2})
+\end{align*}
+and plugging in ($\ast$) gives
+\begin{align*}
+y(t_\ipo) & = \bar y_\ipo + \l(\tfrac{1}{2}\r)^p g_{p+1}(t_i) + \Delta t^{p+1}+O(\Delta t^{p+2})\\
+y(t_\ipo) & = y_\ipo + g_{p+1}(t_i) + \Delta t^{p+1}+O(\Delta t^{p+2}).
+\end{align*}
+We can now define
+\[
+\textrm{EST}^{(\textrm{l})}_\ipo = \frac{ \norm{\bar y_{i+1}^{\Delta t} - y_\ipo^{\Delta t}}}{\l(\tfrac{1}{2}\r)^p -1}
+\]
+as an estimate.
 
+This gives the \textbf{Embedding-Stategy for step size control}. Let us assume that we have two one step methods with incremental functions $\Phi_p$ and $\Phi_q$ such that $\Phi_p$ has order of consistency $p$, i.e. $\eta_p(t,\Delta t) = O(\Delta t^{p+1})$ and $\Phi_q$ has order of consistency $q$, i.e. $\eta_q(t,\Delta t) = O(\Delta t^{q+1})$. Without loss of generality, we can assume $q>p$. Then
+\begin{align*}
+\eta_p(t,\Delta t)
+& = y(t) + \Delta t \Phi_p - y(t+\Delta t) + \Delta t \Phi_q - \Delta t\Phi_q \\
+& = y(t) + \Delta t \Phi_q - y(t+\Delta t) + \Delta t \l(\Phi_p - \Phi_q\r) \\
+& = \eta_q(t,\Delta t) + \Delta t \l(\Phi_p-\Phi_q\r).
+\end{align*}
+If we now \textbf{assume}\footnote{This is not always given!} that the error $\eta_q$ is negligible with respect to $\eta_p$, we have
+\[
+|\Phi_p - \Phi_q| \approx O(\Delta t^p)
+\]
+and so
+\[
+\eta_p(t,\Delta t)\approx \Delta t(\Phi_p-\Phi_q).
+\]
+We define
+\[
+\varepsilon(\Delta t) = \frac{\eta_p(t,\Delta t)}{\Delta t}.
+\]
+With this, the task of finding a new stepsize $\Delta t_{\textrm{new}}$ is realized by
+\[
+\varepsilon(\Delta t_{\textrm{new}}) = \varepsilon_{\textrm{goal}}.
+\]
+With the assumption
+\[
+\eta_p(t,\Delta t) = c \cdot \Delta t^{p+1}
+\]
+we obtain
+\[
+\frac{\varepsilon_{\textrm{goal}}}{\Delta t^p_{\textrm{new}}} \approx \frac{\eta_p(t,\Delta t_{\textrm{new}})}{\Delta t_{\textrm{new}}^{p+1}} \approx c \approx \frac{\eta_p(t,\Delta t)}{\Delta t^{p+1}} \approx \frac{\varepsilon(\Delta t)}{\Delta t^p}
+\]
+so we can use
+\[
+\Delta t_{\textrm{new}} = \Delta t \sqrt[p]{\frac{\varepsilon_{\textrm{goal}}}{\varepsilon(\Delta t)}}
+\]
+as an iteration. Hence, we choose $\Delta t$ courser, if $\varepsilon_{\textrm{goal}}>\varepsilon(\Delta t)$ and else finer.\footnote{Warning! We ha $ \eta_p(t,\Delta t) = O(\Delta t^{p+1}), ~ \textrm{for} ~ \Delta t\to0$, so $\eta_p(t,\Delta t)\leq c \Delta t^{p+1}$ only is a reasonable assumption for small $\Delta t$.}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+The embedding strategy can be realized in a Runge-Kutta scheme. Consider the RKM given by the Butcher table
+\[
+\begin{matrix}[c|cccc]
+0 & & & &\\
+1/2 & 1/2 & & &\\
+3/4 & 0 & 3/4  & &\\
+1 & 2/9 & 1/3 & 4/9 &\\ \hline
+\blau p=2 & \blau 7/24 & \blau 1/4 & \blau 1/3 & \blau 1/8 \\
+p=3 & 2/9 & 1/3 & 4/9 &
+\end{matrix}
+\]
+This means
+\begin{align*}
+r_1 & = f(t_i,y_i) \\
+r_2 & = f \l(t_i + \tfrac{\Delta t}{2},~ y_i + \tfrac{\Delta t}{2} r_1\r) \\
+r_3 & = f \l(t_i + \tfrac{3}{2}\Delta t,~ y_i + \tfrac{3}{2}\Delta t r_2\r) \\
+r_4 & = f \l(t_i + \Delta t,~ y_i + \tfrac{2}{9}\Delta t r_1 + \tfrac{1}{3} \Delta t r_2 + \tfrac{4}{9} \Delta t r_3\r), \\
+\end{align*}
+and
+\begin{align*}
+\blau y_{i+1} & \blau =  y_i + \tfrac{7}{24} r_1 + \tfrac{1}{4} r_2  + \tfrac{1}{3}r_3 + \tfrac{1}{8} r_4 \\
+y_{i+1} & = y_i + \tfrac{2}{9} r_1 + \tfrac{1}{3} r_2 + \tfrac{4}{9} r_3.
+\end{align*}
+Hence, it is possible to gain a higher order by simply changing the weights $b_i$. This RKM is due to \textit{Bobacki-Shampine} and can be found in \texttt{MATLAB} as \texttt{ode23}. Note, that the RKM of higher order does not use $r_4$. The Fehlberg-Trick is known by
+\[
+r_4^i = f\l(t_i+\Delta t, y_i + \Delta t \l( \tfrac{2}{9} r_1^i + \tfrac{1}{3}r_2^i + \tfrac{4}{9} r_3^i\r)\r)=: r_1^{i+1}.
+\]
+This allows for higher effiency and is often used in programming.
 
 
 
