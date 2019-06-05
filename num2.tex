@@ -52,6 +52,7 @@
 \newcommand{\partiell}[2]{\frac{\partial #1}{\partial #2}}
 \newcommand{\nhn}{\newline\hfill\newline}
 \newcommand{\inv}{^{-1}}
+\newcommand{\labtag}[1]{\label{#1}\tag{#1}}
 \renewcommand{\l}{\left}
 \renewcommand{\r}{\right}
 \renewcommand{\P}{\mathbb{P}}
@@ -152,7 +153,7 @@ The system $y'(t)=A(t)y(t)+f(t)$ for some interval $I\subset\R$ with $A(t)=(a_{i
 
 The function $f$ is called inhomogeneity.
 
-The system is called homogenous if $f=0$ and inhomogeneous otherwise.
+The system is called homogeneous if $f=0$ and inhomogeneous otherwise.
 \end{definition}
 
 \begin{theorem}
@@ -2037,15 +2038,15 @@ gives
 This ends the proof.
 \end{proof}
 
-For the further analysis of linear multistep methods, we need the first and second charactaristic polynomials. They are given by
+For the further analysis of linear multistep methods, we need the first and second characteristic polynomials. They are given by
 \[
-\varrho(\xi) = \sum_{j=1 }^{m }\alpha_j \xi^j
+\varrho(\xi) = \sum_{j=0 }^{m }\alpha_j \xi^j
 \]
 and
 \[
-\sigma(\xi) = \sum_{j=1}^{m} \beta_j \xi^j.
+\sigma(\xi) = \sum_{j=0}^{m} \beta_j \xi^j.
 \]
-They are also called generating polynmials. We can thus rewrite the conditions (II.25) in theorem II.26 as
+They are also called \textbf{generating polynmials}. We can thus rewrite the conditions (II.25) in theorem II.26 as
 \[
 \varrho(1) = \sum_{j=1}^{m} \alpha_j, ~~~ \sigma(1) = \sum_{j=1}^{m} \beta_j, ~~~ \varrho'(\xi) = \sum_{j=1}^{m} j \alpha_j \xi^{j-1}.
 \]
@@ -2067,10 +2068,179 @@ e(t_i, \Delta t) = O(\Delta t^p), ~ \Delta t\to 0.
 If the above conditions also hold for $o(1)$ instead of $O(\Delta t^p)$, we call the method \textbf{convergent}.
 \end{definition}
 
-In case of $\beta_j=0$ for all $j$, we have $\Phi = 0$ and thus, the linear multistep method becomes a linear homogenous \textbf{difference equation}, i.e.
+In case of $\beta_j=0$ for all $j$, we have $\Phi = 0$ and thus, the linear multistep method becomes a linear \textbf{homogeneous difference equation}, i.e.
 \[
 \sum_{j=0}^{m }\alpha_j y_{i+j} = 0. \tag{II.27}
 \]
+
+\begin{theorem}
+If the first characteristic polynomial
+\[
+\varrho(\xi) = \sum_{j=0}^{m} \alpha_j \xi^i \tag{II.28}
+\]
+of (II.27) has only pairwise different roots $\xi_1,\dots,x_m\in\C$, then the solution sequence $\folge{y}$ of (II.27) is of the form
+\[
+y_n = \sum_{k=1 }^{m } \gamma_k \xi_k^n, \tag{II.29}
+\]
+where $\gamma_k\in\C$ for all $k$.
+\end{theorem}
+\begin{proof}
+We only give a sketch. We need to show
+\begin{enumerate}[(a)]
+    \item (II.29) is a solution of (II.27) and
+    \item the solution space has dimension $m$ and $(\xi^n_k)_{n\in\N}$ is a basis.
+\end{enumerate}
+\begin{enumerate}[{ad }(a).]
+    \item By plugging in (II.29) we obtain
+    \[
+    \sum_{j=0}^{m }\alpha_j y_{i+j} = \sum_{j=0}^{m} \alpha_j \sum_{k=1}^{m}\gamma_k \xi_k^{i+j} = \sum_{k=1}^{m }\gamma_k\xi_k^i \cdot \underbrace{\sum_{j=0}^{m} \alpha_j \xi_k^j}_{=\varrho(\xi_k)=0} = 0.
+    \]
+    \item The main idea is to consider that each solution sequence $\folge{y}$ needs starting values $y_0,\dots,y_{m-1}\in\C$. This means the set of starting vectors $\l\{s^{(1)},\dots,s^{(m)}\r\}$ is a basis of $\C^m$. Each starting vector $s=\begin{bmatrix} y_0 & \dots & y_{m-1} \end{bmatrix}^T$ can be written as
+    \[
+    s=\sum_{j=1}^{m }\gamma_j s^{(j)}.
+    \]
+    Then, one can show that out of $\folge{s}$ it is possible to build $\folge{y}$.\footnote{This is the long part of the proof.}
+\end{enumerate}
+\end{proof}
+
+\begin{example}
+We consider the ODE
+\[
+y'(t) = 0,~ y(0) = 0.1
+\]
+and apply
+\[
+y_{i+2} + 4 y_{i+1} - 5 y_i = \Delta t \big( 4f(t_\ipo,y_\ipo) + 2 f(t_i,y_i) \big). \labtag{II.30}
+\]
+This method is consistent of order $3$ with respect to $y'(t) = f(t,y(t))$. Applying it to \eqref{II.30} gives
+\[
+y_{i+2} + 4 y_{i+1} - 5y_i = 0.
+\]
+According to theorem II.28 we have
+\[
+y_n = \gamma_1 \xi_1^n + \gamma_2 \xi_2^n, \tag{II.31}
+\]
+where we have determined $\gamma_1,\gamma_2$ by the initial conditions and $\xi_1$ and $\xi_2$ are the roots of the first characteristic polynomial. We have
+\[
+\varrho(\xi) = \xi^2 + 4\xi - 5 = (\xi-1)(\xi+5),
+\]
+so it holds $\xi_1 = 1$ and $\xi_2 = -5$. Setting
+\[
+y_0 = 0.1 \und y_1=0.1 + \varepsilon,
+\]
+where $\varepsilon>0$ is a small perturbation, with (II.31) we obtain
+\[
+0.1 = \gamma_1 + \gamma_2 \und 0.1 + \varepsilon = \gamma_1 - 5 \gamma_2,
+\]
+so it holds
+\[
+\gamma_1 = 0.1 + \frac{\varepsilon}{6} \und \gamma_2 = - \frac{\varepsilon}{6}.
+\]
+Hence
+\[
+y_n = 0.1 + \frac{\varepsilon}{6} - \frac{\varepsilon}{6}(-5)^n.
+\]
+The solution of (II.30) is $y(t)=0.1$. For a fixed $T$ and $\Delta t=\tfrac{T}{n}$, where $n\in\N$, we have
+\[
+\limn |y(T)-y_n| = \limn |\frac{\varepsilon}{6} - \frac{\varepsilon}{6} (-5)^n| = \infty.
+\]
+Even for $y_0=y_1=0.1$ we end up with $|y_{50}|\approx 6.5\cdot 10^{16}$.
+\end{example}
+
+\begin{definition}
+A multistep method
+\[
+\sum_{j=0}^{ m }\alpha_j y_{i+j} = \Delta t \Phi(t,y_i,\dots,y_{i+m},\Delta t)
+\]
+is called \textbf{zero stable}, if the corresponding first characteristic polynomial
+\[
+\varrho(\xi) = \sum_{j=0}^{ m }\alpha_j \xi^j
+\]
+meets the \textit{Dahlquist root condition}, i.e. {all roots of the polynomials lie inside of the closed complex unit circle and on the boundary if they are simple.}
+\end{definition}
+
+\begin{remark}
+In the beginning of theorem II.26 we had $\varrho(1)=0$. This is why we want the roots on the boundary when they are simple.
+\end{remark}
+
+\begin{theorem}
+A convergent linear multistep method is necessarily consistent and zero stable.
+\end{theorem}
+\begin{proof}
+We will show
+\begin{enumerate}[(i)]
+    \item zero stability (by contradiction) and
+    \item consistency $\varrho(1) = 0$ and $\varrho'(1)=\sigma(1)$.
+\end{enumerate}
+\begin{enumerate}[{ad }(i):]
+    \item Let us assume, that the method is convergent but not zero stable. Apply the linear multistep method on
+    \[
+    y'(t) = 0, ~y(0) = 0, ~t\in[0,1]
+    \]
+    with solution $y(t)=0$. For $i=0,1,\dots$ we have
+    \[
+    \alpha_m y_{i+m} + \dots + \alpha_0 y_0 = 0. \labtag{II.32}
+    \]
+    Since the method is \textbf{not} zero stable, we have either a simple root $\xi_1$ with $|\xi_1|>1$ or a multiple root $\xi_2$ with $|\xi_2|=1$. Our goal is to generate initial values (meeting the definition for convergence) and show that \eqref{II.32} diverges.
+
+    For the case of $|\xi_1|>1$, we know that according to theorem II.28 a solution of \eqref{II.32} is given as
+    \[
+    y_n = \sqrt{\Delta t}~\xi_1^n.
+    \]
+    The first $m$ elements meet
+    \[
+    \lim_{\Delta t\to0} |y_j - y(t_j)| = \lim_{\Delta t\to0} \l|\sqrt{\Delta t}~\xi_1^j\r| = 0
+    \]
+    for $j=0,\dots,m-1$ and thus the definition for the convergence. For some fixed $T = n \Delta t \in (0,1)$ with $n>m$ we obtain
+    \[
+    \lim_{\Delta t\to0} |y_n-y(T)| = \lim_{\Delta t\to0} \l|\sqrt{\Delta t}~\xi^{T/\Delta t}_1\r| = \infty,
+    \]
+    which is a contradiction to the assumed convergence.
+
+    On the other hand, if $|\xi_2|=1$, since $\xi_2$ is a multiple root it holds
+    \[
+    0 = \varrho'(\xi_2) = \alpha_1 + 2 \alpha_2 \xi_2 + \dots + m \alpha_m \xi_2^{m-1}.
+    \]
+    We set
+    \[
+    y_n = n \cdot \sqrt{\Delta t}~ \xi_2^{n-1},
+    \]
+    such that
+    \[
+    \sum_{j=0}^{m} \alpha_j y_{i+j} = \sum_{j=0}^{m }\alpha_j(i+j)\sqrt{\Delta t}~\xi_2^{i_j-1} = \sqrt{\Delta t} ~ i \xi_2^j \sum_{j=0}^{m } j\alpha_j \xi_2^{j-1} = 0
+    \]
+    is a solution of the difference equation \eqref{II.32}, where the starting values $y_0,\dots,y_{m-1}$ with
+    \[
+    \lim_{\Delta t\to0} |y_j-y(t_j)| = \lim_{\Delta t\to0} \l| j \cdot \sqrt{\Delta t}\r| = 0
+    \]
+    meet the definition for convergence. For a fixed $T=n \Delta t\in (0,1)$ with $n\geq m$ we have
+    \[
+    \lim_{\Delta t\to0} |y_n - y(T)| = \lim_{\Delta t\to0} |n\sqrt{\Delta t} \cdot 1|=\lim_{\Delta t\to0} \l| \frac{T}{\sqrt{\Delta t}}\r| = \infty.
+    \]
+    This again is a contradiction. Thus, zero stability is necessary for convergence.
+
+    \item For $\varrho(1)=0$ consider the ODE
+    \[
+    y'(t) =0,~ y(0)=1,~ t\in[0,1]
+    \]
+    with exact solution $y = 1$. The corresponding difference equation is identical to the one before. For the starting values $y_0,\dots,y_{m-1}$ and for $t = m \cdot \Delta t$ we have
+    \begin{align*}
+    0 & = \lim_{\Delta t\to 0} \alpha_m (y(m \Delta t)-y_n) \\
+    & = \lim_{\Delta t\to 0} \alpha_m(1-y_m) \\
+    & = \sum_{j=0}^{m } \alpha_j (1 - y_j) \\
+    & = \sum_{j=0}^{m } \alpha_j - \underbrace{\sum_{j=0 }^{m }\alpha_j y_j}_{=0} = \varrho(1).
+    \end{align*}
+
+    {\rot The part $\varrho'(1) = \sigma(1)$ will be done on tuesday.}
+\end{enumerate}
+\end{proof}
+
+
+
+
+
+
+
 
 
 
