@@ -2078,7 +2078,7 @@ If the first characteristic polynomial
 \[
 \varrho(\xi) = \sum_{j=0}^{m} \alpha_j \xi^i \tag{II.28}
 \]
-of (II.27) has only pairwise different roots $\xi_1,\dots,x_m\in\C$, then the solution sequence $\folge{y}$ of (II.27) is of the form
+of (II.27) has only pairwise different roots $\xi_1,\dots,\x_m\in\C$, then the solution sequence $\folge{y}$ of (II.27) is of the form
 \[
 y_n = \sum_{k=1 }^{m } \gamma_k \xi_k^n, \tag{II.29}
 \]
@@ -2106,11 +2106,11 @@ We only give a sketch. We need to show
 \begin{example}
 We consider the ODE
 \[
-y'(t) = 0,~ y(0) = 0.1
+y'(t) = 0,~ y(0) = 0.1  \labtag{II.30}
 \]
 and apply
 \[
-y_{i+2} + 4 y_{i+1} - 5 y_i = \Delta t \big( 4f(t_\ipo,y_\ipo) + 2 f(t_i,y_i) \big). \labtag{II.30}
+y_{i+2} + 4 y_{i+1} - 5 y_i = \Delta t \big( 4f(t_\ipo,y_\ipo) + 2 f(t_i,y_i) \big). 
 \]
 This method is consistent of order $3$ with respect to $y'(t) = f(t,y(t))$. Applying it to \eqref{II.30} gives
 \[
@@ -2144,7 +2144,7 @@ The solution of (II.30) is $y(t)=0.1$. For a fixed $T$ and $\Delta t=\tfrac{T}{n
 \[
 \limn |y(T)-y_n| = \limn |\frac{\varepsilon}{6} - \frac{\varepsilon}{6} (-5)^n| = \infty.
 \]
-Even for $y_0=y_1=0.1$ we end up with $|y_{50}|\approx 6.5\cdot 10^{16}$.
+Even for $y_0=y_1=0.1$ we end up with $|y_{50}|\approx 6.5\cdot 10^{16}$. \textcolor{red}{This is not true. In this case $\varepsilon = 0$ and with (II.30) we obtain that $y_n = 0.1$ f.a. $n \in \mathbb{N}}
 \end{example}
 
 \begin{definition}
@@ -2179,7 +2179,7 @@ We will show
     \]
     with solution $y(t)=0$. For $i=0,1,\dots$ we have
     \[
-    \alpha_m y_{i+m} + \dots + \alpha_0 y_0 = 0. \labtag{II.32}
+    \alpha_m y_{i+m} + \dots + \alpha_0 y_i = 0. \labtag{II.32}
     \]
     Since the method is \textbf{not} zero stable, we have either a simple root $\xi_1$ with $|\xi_1|>1$ or a multiple root $\xi_2$ with $|\xi_2|=1$. Our goal is to generate initial values (meeting the definition for convergence) and show that \eqref{II.32} diverges.
 
@@ -2207,7 +2207,7 @@ We will show
     \]
     such that
     \[
-    \sum_{j=0}^{m} \alpha_j y_{i+j} = \sum_{j=0}^{m }\alpha_j(i+j)\sqrt{\Delta t}~\xi_2^{i_j-1} = \sqrt{\Delta t} ~ i \xi_2^j \sum_{j=0}^{m } j\alpha_j \xi_2^{j-1} = 0
+    \sum_{j=0}^{m} \alpha_j y_{i+j} = \sum_{j=0}^{m }\alpha_j(i+j)\sqrt{\Delta t}~\xi_2^{i_j-1} = \sqrt{\Delta t} ~ i \xi_2^{i-1}  \sum_{j=0}^{m } \alpha_j \xi_2^{j} + \sqrt{\Delta t} ~ \xi_2^i \sum_{j=0}^{m } j\alpha_j \xi_2^{j-1} = 0
     \]
     is a solution of the difference equation \eqref{II.32}, where the starting values $y_0,\dots,y_{m-1}$ with
     \[
